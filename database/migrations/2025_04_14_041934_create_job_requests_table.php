@@ -16,6 +16,7 @@ return new class extends Migration
             $table->timestamps();
             // Relationships
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('worker_id')->nullable();
             // Job request number
             $table->string('job_number')->unique();
             // Contact information
@@ -33,6 +34,9 @@ return new class extends Migration
             $table->string('urgency_level');
             $table->integer('job_budget')->nullable();
             $table->string('job_description');
+            // Internal Use
+            $table->string('status')->default('Pending'); // Pending, In Progress, Completed, Cancelled
+            $table->string('notes')->nullable(); // Internal notes for the job request
         });
     }
 

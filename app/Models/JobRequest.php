@@ -17,7 +17,11 @@ class JobRequest extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
+    // The 'worker' method indicates that a job request can be assigned to a worker
+    public function worker()
+    {
+        return $this->belongsTo(User::class, 'worker_id');
+    }
 
     // Lifecycle Hooks
     // This method is called after the model is instantiated
