@@ -35,6 +35,7 @@ return new class extends Migration
             $table->integer('job_budget')->nullable();
             $table->string('job_description');
             // Internal Use
+            $table->dateTime('completion_date')->nullable(); // Date when the job was completed
             $table->string('status')->default('Pending'); // Pending, In Progress, Completed, Cancelled
             $table->string('notes')->nullable(); // Internal notes for the job request
         });
