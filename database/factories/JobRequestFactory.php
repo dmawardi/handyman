@@ -36,4 +36,17 @@ class JobRequestFactory extends Factory
             'job_description' => $this->faker->paragraph(),
         ];
     }
+    /**
+     * Assign a specific user to the created job request.
+     *
+     * @return static
+     */
+    public function forUser($userId): static
+    {
+        return $this->state(function (array $attributes) use ($userId) {
+            return [
+                'user_id' => $userId,
+            ];
+        });
+    }
 }

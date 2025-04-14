@@ -19,5 +19,16 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Create 5 job requests for the test user
+        \App\Models\JobRequest::factory(5)->create([
+            'user_id' => 1, // Assuming the test user has ID 1
+        ]);
+        // Create 5 job updates for each job request
+        \App\Models\JobRequest::all()->each(function ($jobRequest) {
+            \App\Models\JobUpdate::factory(5)->create([
+                'job_request_id' => $jobRequest->id,
+            ]);
+        });
     }
 }
