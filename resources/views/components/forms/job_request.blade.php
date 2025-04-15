@@ -81,13 +81,13 @@
                             <div>
                                 <x-input-label for="job_type" :value="__('Job Type')" />
                                 <select id="job_type" name="job_type" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                    <option value="">Select job type</option>
                                     <option value="Plumbing" {{ old('job_type') == 'Plumbing' ? 'selected' : '' }}>Plumbing</option>
                                     <option value="Electrical" {{ old('job_type') == 'Electrical' ? 'selected' : '' }}>Electrical</option>
-                                    <option value="Carpentry" {{ old('job_type') == 'Carpentry' ? 'selected' : '' }}>Carpentry</option>
                                     <option value="Painting" {{ old('job_type') == 'Painting' ? 'selected' : '' }}>Painting</option>
                                     <option value="Appliance Repair" {{ old('job_type') == 'Appliance Repair' ? 'selected' : '' }}>Appliance Repair</option>
-                                    <option value="General Maintenance" {{ old('job_type') == 'General Maintenance' ? 'selected' : '' }}>General Maintenance</option>
+                                    <option value="Outdoor/Garden" {{ old('job_type') == 'Outdoor/Garden' ? 'selected' : '' }}>Outdoor/Garden</option>
+                                    <option value="Installations" {{ old('job_type') == 'Installations' ? 'selected' : '' }}>Installations</option>
+                                    <option value="Cleaning/Maintenance" {{ old('job_type') == 'Cleaning/Maintenance' ? 'selected' : '' }}>Cleaning/Maintenance</option>
                                     <option value="Other" {{ old('job_type') == 'Other' ? 'selected' : '' }}>Other</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('job_type')" class="mt-2" />
@@ -98,10 +98,10 @@
                                 <x-input-label for="urgency_level" :value="__('Urgency Level')" />
                                 <select id="urgency_level" name="urgency_level" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
                                     <option value="">Select urgency</option>
-                                    <option value="Low" {{ old('urgency_level') == 'Low' ? 'selected' : '' }}>Low - Within 2 weeks</option>
-                                    <option value="Medium" {{ old('urgency_level') == 'Medium' ? 'selected' : '' }}>Medium - Within 1 week</option>
-                                    <option value="High" {{ old('urgency_level') == 'High' ? 'selected' : '' }}>High - Within 48 hours</option>
-                                    <option value="Emergency" {{ old('urgency_level') == 'Emergency' ? 'selected' : '' }}>Emergency - Same day</option>
+                                    <option value="Low - Within 2 weeks" {{ old('urgency_level') == 'Low' ? 'selected' : '' }}>Low - Within 2 weeks</option>
+                                    <option value="Medium - Within 1 week" {{ old('urgency_level') == 'Medium' ? 'selected' : '' }}>Medium - Within 1 week</option>
+                                    <option value="High - Within 48 hours" {{ old('urgency_level') == 'High' ? 'selected' : '' }}>High - Within 48 hours</option>
+                                    <option value="Emergency - Same day" {{ old('urgency_level') == 'Emergency' ? 'selected' : '' }}>Emergency - Same day</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('urgency_level')" class="mt-2" />
                             </div>

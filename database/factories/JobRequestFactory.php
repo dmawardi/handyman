@@ -30,8 +30,22 @@ class JobRequestFactory extends Factory
             'zip_code' => $this->faker->postcode(),
             'city' => $this->faker->city(),
             'location' => $this->faker->city(),
-            'job_type' => $this->faker->randomElement(['Plumbing' , 'Electrical' , 'Carpentry' , 'Cleaning/Maintenance' , 'Outdoor/Garden' , 'Installations']),
-            'urgency_level' => $this->faker->randomElement(['Emergency' , 'Within 24 hrs' , 'Within 3 days' , 'Flexible']),
+            'job_type' => $this->faker->randomElement([
+                'Plumbing',
+                'Electrical',
+                'Painting', 
+                'Appliance Repair',
+                'Outdoor/Garden',
+                'Installations',
+                'Cleaning/Maintenance',
+                'Other'
+            ]),
+            'urgency_level' => $this->faker->randomElement([
+                'Low - Within 2 weeks',
+                'Medium - Within 1 week',
+                'High - Within 48 hours',
+                'Emergency - Same day'
+            ]),
             'job_budget' => $this->faker->numberBetween(100, 10000),
             'job_description' => $this->faker->paragraph(),
         ];
