@@ -9,7 +9,14 @@ class JobRequestController extends Controller
 {
     public function index()
     {
-        // Logic to display all job requests
+        // Check if user is logged in, if not send to login page
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Please log in to view your job requests.');
+        }
+        // Fetch all job requests for the authenticated user
+        $user = auth()->user();
+        $jobRequests = \App\Models\JobRequest::where('user_id', $user->id)->get();
+        return view('job_requests.index', compact('jobRequests'));
     }
 
     public function create()
@@ -37,6 +44,10 @@ class JobRequestController extends Controller
 
         // Find the user by email
         $user = \App\Models\User::where('email', $validated['contact_email'])->first();
+        Log::info("User lookup", [
+            'email' => $validated['contact_email'],
+            'user_found' => $user ? true : false
+        ]);
         if (!$user) {
             // If the user does not exist, create a new user
             $user = new \App\Models\User();
@@ -45,6 +56,7 @@ class JobRequestController extends Controller
             $user->phone = $validated['contact_phone'];
             // Set a default password or generate one
             $user->password = bcrypt('defaultpassword'); // Use a secure password generation method in production
+            Log::info("Creating new user", $user->toArray());
             $user->save();
         }
         
