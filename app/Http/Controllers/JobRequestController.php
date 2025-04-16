@@ -88,7 +88,21 @@ class JobRequestController extends Controller
 
     public function show($id)
     {
-        // Logic to display a specific job request
+        // Check if user is logged in, if not send to login page
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Please log in to view job request details.');
+        }
+        // Fetch the user and check user type
+        $loggedInUser = auth()->user();
+        // Logic to show a specific job request
+        $jobRequest = \App\Models\JobRequest::findOrFail($id);
+        // Check if the job request belongs to the logged-in user
+        if ($jobRequest->user_id !== $loggedInUser->id) {
+            // If the job request does not belong to the logged-in user
+            return redirect()->route('job-requests.index')->with('error', 'You do not have permission to view this job request.');
+        }
+        // If it does belong, show the job request details
+        return view('job_requests.show', compact('jobRequest'));
     }
 
     public function edit($id)
