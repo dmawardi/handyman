@@ -9,10 +9,6 @@ class JobRequestController extends Controller
 {
     public function index()
     {
-        // Check if user is logged in, if not send to login page
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'Please log in to view your job requests.');
-        }
         // Fetch all job requests for the authenticated user
         $user = auth()->user();
         $jobRequests = \App\Models\JobRequest::where('user_id', $user->id)->get();
@@ -88,10 +84,6 @@ class JobRequestController extends Controller
 
     public function show($id)
     {
-        // Check if user is logged in, if not send to login page
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'Please log in to view job request details.');
-        }
         // Fetch the user and check user type
         $loggedInUser = auth()->user();
         // Logic to show a specific job request
