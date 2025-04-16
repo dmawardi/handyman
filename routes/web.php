@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
     // Job request routes
     Route::get('/job-requests', [JobRequestController::class, 'index'])->name('job-requests.index');
     Route::get('/job-requests/{jobRequest}', [JobRequestController::class, 'show'])->name('job-requests.show');
+    Route::get('/job-requests/{jobRequest}/edit', [JobRequestController::class, 'edit'])->name('job-requests.edit');
     // Other authenticated routes...
     Route::patch('/job-requests/{jobRequest}', [JobRequestController::class, 'update'])->name('job-requests.update');
     Route::delete('/job-requests/{jobRequest}', [JobRequestController::class, 'destroy'])->name('job-requests.destroy');

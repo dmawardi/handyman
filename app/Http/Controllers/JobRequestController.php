@@ -99,12 +99,66 @@ class JobRequestController extends Controller
 
     public function edit($id)
     {
-        // Logic to show the form for editing a specific job request
+        $loggedInUser = auth()->user();
+        $jobRequest = \App\Models\JobRequest::findOrFail($id);
+        
+        // Check if the job request belongs to the logged-in user
+        if ($jobRequest->user_id !== $loggedInUser->id) {
+            return redirect()->route('job-requests.index')
+                ->with('error', 'You do not have permission to edit this job request.');
+        }
+        
+        // Only allow editing of pending job requests
+        if ($jobRequest->status !== 'Pending') {
+            return redirect()->route('job-requests.show', $jobRequest->id)
+                ->with('error', 'Only pending job requests can be edited.');
+        }
+        
+        return view('job_requests.edit', compact('jobRequest'));
     }
 
     public function update(Request $request, $id)
     {
-        // Logic to update a specific job request
+        // Fetch the user and the job request
+        $loggedInUser = auth()->user();
+        $jobRequest = \App\Models\JobRequest::findOrFail($id);
+        
+        // Check if the job request belongs to the logged-in user
+        if ($jobRequest->user_id !== $loggedInUser->id) {
+            return redirect()->route('job-requests.index')
+                ->with('error', 'You do not have permission to update this job request.');
+        }
+        
+        // Only allow updating of pending job requests
+        if ($jobRequest->status !== 'Pending') {
+            return redirect()->route('job-requests.show', $jobRequest->id)
+                ->with('error', 'Only pending job requests can be updated.');
+        }
+        
+        // Validate the request data - customer facing fields only
+        $validated = $request->validate([
+            'contact_name' => 'required|string|max:255',
+            'contact_phone' => 'required|string|max:20',
+            'street_address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'zip_code' => 'nullable|string|max:20',
+            'location' => 'nullable|string|max:255',
+            'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
+            'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
+            'job_budget' => 'nullable|numeric|min:0',
+            'job_description' => 'required|string',
+        ]);
+        
+        // Note: We don't allow changing the email as it's tied to user identity
+        
+        // Update the job request with validated data
+        $jobRequest->update($validated);
+        
+        Log::info('Job request updated', ['job_request' => $jobRequest]);
+        
+        return redirect()->route('job-requests.show', $jobRequest->id)
+            ->with('success', 'Job request updated successfully!');
     }
 
     public function destroy($id)
