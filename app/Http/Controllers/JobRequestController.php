@@ -163,7 +163,30 @@ class JobRequestController extends Controller
 
     public function destroy($id)
     {
-        // Logic to delete a specific job request
+        // Fetch the user and job request
+        $loggedInUser = auth()->user();
+        $jobRequest = \App\Models\JobRequest::findOrFail($id);
+        
+        // Check if the job request belongs to the logged-in user
+        if ($jobRequest->user_id !== $loggedInUser->id) {
+            return redirect()->route('job-requests.index')
+                ->with('error', 'You do not have permission to cancel this job request.');
+        }
+        
+        // Only allow cancellation of pending job requests
+        if ($jobRequest->status !== 'Pending') {
+            return redirect()->route('job-requests.show', $jobRequest->id)
+                ->with('error', 'Only pending job requests can be cancelled.');
+        }
+        
+        // Change status to cancelled (soft delete)
+        $jobRequest->status = 'Cancelled';
+        $jobRequest->save();
+        
+        Log::info('Job request cancelled', ['job_request' => $jobRequest]);
+        
+        return redirect()->route('job-requests.index')
+            ->with('success', 'Job request cancelled successfully.');
     }
 
 

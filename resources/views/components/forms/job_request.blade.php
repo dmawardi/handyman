@@ -20,7 +20,7 @@
                             <div>
                                 <x-input-label for="contact_email" :value="__('Contact Email')" />
                                 @auth
-                                    <x-text-input id="contact_email" name="contact_email" type="email" class="mt-1 block w-full bg-gray-100" value="{{ auth()->user()->email }}" readonly disabled />
+                                    <x-text-input id="contact_email" name="contact_email" type="email" class="mt-1 block w-full bg-gray-100" value="{{ auth()->user()->email }}" readonly />
                                     <p class="mt-1 text-xs text-gray-500">Email address is linked to your account and cannot be changed</p>
                                 @else
                                     <x-text-input id="contact_email" name="contact_email" type="email" class="mt-1 block w-full" :value="old('contact_email')" required autocomplete="email" />
