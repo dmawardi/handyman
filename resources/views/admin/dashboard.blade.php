@@ -6,13 +6,11 @@
             {{ __('Dashboard') }}
         </h2>
     </x-slot>
-    @if (session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
-        </div>
-    @endif
 
     <div class="py-12">
+        <h1>
+            This is the admin page
+        </h1>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -22,3 +20,6 @@
         </div>
     </div>
 </x-app-layout>
+{{-- 
+    This is the dashboard view for the admin panel. It extends the app layout and includes a header and a main content area.
+    The main content area displays a message indicating that the user is logged in.
