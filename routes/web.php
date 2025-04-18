@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobRequestController;
+use App\Http\Controllers\Admin\JobRequestController as AdminJobRequestController;
 use App\Http\Controllers\Admin\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+
+    // Job request management routes
+    Route::get('/admin/job-requests', [AdminJobRequestController::class, 'index'])->name('admin.job-requests.index');
+    Route::get('/admin/job-requests/create', [AdminJobRequestController::class, 'create'])->name('admin.job-requests.create');
+    Route::get('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'show'])->name('admin.job-requests.show');
+    Route::get('/admin/job-requests/{jobRequest}/edit', [AdminJobRequestController::class, 'edit'])->name('admin.job-requests.edit');
+    Route::patch('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'update'])->name('admin.job-requests.update');
+    Route::delete('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'destroy'])->name('admin.job-requests.destroy');
 });
 
 require __DIR__.'/auth.php';
