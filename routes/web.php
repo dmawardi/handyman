@@ -69,6 +69,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Job request management routes
     Route::get('/admin/job-requests', [AdminJobRequestController::class, 'index'])->name('admin.job-requests.index');
     Route::get('/admin/job-requests/create', [AdminJobRequestController::class, 'create'])->name('admin.job-requests.create');
+    Route::post('/admin/job-requests', [AdminJobRequestController::class, 'store'])->name('admin.job-requests.store');
     Route::get('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'show'])->name('admin.job-requests.show');
     Route::get('/admin/job-requests/{jobRequest}/edit', [AdminJobRequestController::class, 'edit'])->name('admin.job-requests.edit');
     Route::patch('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'update'])->name('admin.job-requests.update');

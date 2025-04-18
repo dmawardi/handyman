@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class JobRequestController extends Controller
 {
@@ -60,13 +63,63 @@ class JobRequestController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the request data
-        $validated = $request->validate([
+        Log::info('Admin creating job request', [
+            'data' => $request->all()
+        ]);
+        // Check if the job request is made for an existing user or a new one
+        if ($request->customer_type === 'existing') {
+            Log::info('Checking for existing user', [
+                'user_id' => $request->user_id
+            ]);
+            // Validate for existing user
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+            ]);
+
+            // Find user and add contact details
+            $user = User::find($request->user_id);
+            $request->merge([
+                'contact_name' => $user->name,
+                'contact_email' => $user->email,
+                'contact_phone' => $user->phone,
+            ]);
+        } else {
+            // Else, validate for new user
+            $request->validate([
+                'contact_name' => 'required|string|max:255',
+                'contact_email' => 'required|email|max:255',
+                'contact_phone' => 'required|string|max:20',
+            ]);
+            // Create a new user
+            $user = User::create([
+                'name' => $request->contact_name,
+                'email' => $request->contact_email,
+                'phone' => $request->contact_phone,
+                'user_type' => 'customer',
+                'password' => bcrypt('defaultpassword'), // Generate random password
+            ]);
+            $request->merge([
+                'user_id' => $user->id,
+                'contact_name' => $user->name,
+                'contact_email' => $user->email,
+                'contact_phone' => $user->phone,
+            ]);
+        }
+
+        
+        // Properly extract only the fields we need, excluding customer_type
+        $validationData = $request->except(['customer_type']);
+        Log::info('Completed existing/new user check', [
+            'data' => $validationData]
+        );
+        
+        // Validate the filtered data
+        $validated = Validator::make($validationData, [
             'user_id' => 'required|exists:users,id',
-            'worker_id' => 'nullable|exists:users,id',
             'contact_name' => 'required|string|max:255',
             'contact_email' => 'required|email|max:255',
-            'contact_phone' => 'required|string|max:20',
+            'contact_phone' => 'nullable|string|max:20',
+            'worker_id' => 'nullable|exists:users,id',
             'street_address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
@@ -78,7 +131,7 @@ class JobRequestController extends Controller
             'job_description' => 'required|string',
             'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
             'notes' => 'nullable|string',
-        ]);
+        ])->validate();
         
         // Generate a unique job number
         $jobNumber = $this->generateJobNumber();
@@ -100,7 +153,7 @@ class JobRequestController extends Controller
             'job_request' => $jobRequest->toArray()
         ]);
         
-        return redirect()->route('admin.job_requests.index')
+        return redirect()->route('admin.job-requests.index')
             ->with('success', 'Job request created successfully. Job number: ' . $jobNumber);
     }
 
