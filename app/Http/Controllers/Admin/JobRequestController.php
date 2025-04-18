@@ -163,7 +163,7 @@ class JobRequestController extends Controller
     public function show(JobRequest $jobRequest)
     {
         // Load associated user and worker
-        $jobRequest->load(['user', 'worker']);
+        $jobRequest->load(['requestor', 'worker']);
         
         return view('admin.job_requests.show', compact('jobRequest'));
     }
@@ -218,13 +218,7 @@ class JobRequestController extends Controller
         // Update the job request
         $jobRequest->update($validated);
         
-        Log::info('Admin updated job request', [
-            'admin_id' => auth()->id(),
-            'job_request_id' => $jobRequest->id,
-            'changes' => $validated
-        ]);
-        
-        return redirect()->route('admin.job_requests.show', $jobRequest)
+        return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Job request updated successfully.');
     }
 
