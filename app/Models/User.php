@@ -33,6 +33,16 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    // Foreign key relationships
+    public function jobRequests()
+    {
+        return $this->hasMany(JobRequest::class, 'user_id');
+    }
+    public function jobRequestsAssigned()
+    {
+        return $this->hasMany(JobRequest::class, 'worker_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

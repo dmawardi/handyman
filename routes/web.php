@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobRequestController;
 use App\Http\Controllers\Admin\JobRequestController as AdminJobRequestController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -62,9 +63,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // login and logout routes
     Route::post('/admin/logout', [AuthController::class, 'destroy'])->name('admin.logout');
     // Admin dashboard
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // Job request management routes
     Route::get('/admin/job-requests', [AdminJobRequestController::class, 'index'])->name('admin.job-requests.index');
