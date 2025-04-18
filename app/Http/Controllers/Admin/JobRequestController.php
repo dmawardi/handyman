@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobRequest;
+use App\Models\JobUpdate;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -163,7 +164,9 @@ class JobRequestController extends Controller
     public function show(JobRequest $jobRequest)
     {
         // Load associated user and worker
-        $jobRequest->load(['requestor', 'worker']);
+        $jobRequest->load(['requestor', 'worker', 'noteUpdates' => function ($query) {
+            $query->orderBy('created_at', 'asc');
+        }]);
         $workers = User::where('user_type', 'worker')->get();
         
         return view('admin.job_requests.show', compact('jobRequest', 'workers'));
@@ -312,17 +315,15 @@ class JobRequestController extends Controller
     public function addNotes(Request $request, JobRequest $jobRequest)
     {
         $validated = $request->validate([
-            'notes' => 'required|string',
+            'noteUpdate' => 'required|string',
         ]);
-        
-        $jobRequest->notes = $validated['notes'];
-        $jobRequest->save();
-        
-        Log::info('Admin added notes to job request', [
-            'admin_id' => auth()->id(),
-            'job_request_id' => $jobRequest->id,
-            'notes' => $validated['notes']
-        ]);
+        // Add to relationship JobUpdate
+        $jobUpdate = new JobUpdate();
+        $jobUpdate->job_request_id = $jobRequest->id;
+        $jobUpdate->update_type = 'note';
+        $jobUpdate->update_description = $validated['noteUpdate'];
+        $jobUpdate->user_id = auth()->id(); // Assuming the admin is the one adding the note
+        $jobUpdate->save();
         
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Notes added successfully.');

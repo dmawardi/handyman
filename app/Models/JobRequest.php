@@ -23,6 +23,11 @@ class JobRequest extends Model
         return $this->belongsTo(User::class, 'worker_id');
     }
 
+    public function noteUpdates()
+    {
+        return $this->hasMany(JobUpdate::class);
+    }
+
     // Lifecycle Hooks
     // This method is called after the model is instantiated
     protected static function booted()

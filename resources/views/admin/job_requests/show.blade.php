@@ -228,19 +228,44 @@
                                 @endif
                             </div>
                             
-                            <!-- Add Notes Form -->
-                            {{-- <form method="POST" action="{{ route('admin.job-requests.addNotes', $jobRequest->id) }}" class="mt-4">
+                            {{-- Print the note updates --}}
+                            <h4 class="text-lg font-medium text-gray-900 mb-4">Note Updates</h4>
+                            @if($jobRequest->noteUpdates->isNotEmpty())
+                                <div class="overflow-y-auto max-h-64 border border-gray-200 rounded-md p-2" id="note-updates-container">
+                                    <ul class="list-none pl-5">
+                                        @foreach($jobRequest->noteUpdates as $noteUpdate)
+                                            <li class="mb-2">
+                                                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                                                    <p class="text-sm text-gray-700">{{ $noteUpdate->update_type }}</p>
+                                                    <p class="text-sm text-gray-700">{{ $noteUpdate->update_description }}</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Updated on {{ $noteUpdate->created_at->format('F j, Y, g:i a') }}</p>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const container = document.getElementById('note-updates-container');
+                                        container.scrollTop = container.scrollHeight;
+                                    });
+                                </script>
+                            @else
+                                <p class="text-gray-500 italic">No note updates have been added yet.</p>
+                            @endif
+                            <!-- Add Update Notes Form -->
+                            <form method="POST" action="{{ route('admin.job-requests.add-update', $jobRequest->id) }}" class="mt-4">
                                 @csrf
                                 <div class="mb-4">
-                                    <textarea name="notes" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Add internal notes here...">{{ $jobRequest->notes }}</textarea>
-                                    <x-input-error :messages="$errors->get('notes')" class="mt-2" />
+                                    <textarea name="noteUpdate" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Add internal notes here..."></textarea>
+                                    <x-input-error :messages="$errors->get('noteUpdate')" class="mt-2" />
                                 </div>
                                 <div class="flex justify-end">
                                     <button type="submit" class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition ease-in-out duration-150">
-                                        Save Notes
+                                        Save Note Update
                                     </button>
                                 </div>
-                            </form> --}}
+                            </form>
                         </div>
                     </div>
 

@@ -20,7 +20,6 @@ return new class extends Migration
             // Fields for job updates
             $table->string('update_type'); // Type of update (e.g., status change, note)
             $table->string('update_description'); // Description of the update
-            $table->string('updated_by'); // User who made the update
         });
     }
 

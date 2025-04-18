@@ -20,7 +20,6 @@ class JobUpdateFactory extends Factory
             'job_request_id' => \App\Models\JobRequest::factory(),
             'update_type' => $this->faker->randomElement(['status_change', 'note']),
             'update_description' => $this->faker->sentence(),
-            'updated_by' => $this->faker->name(),
         ];
     }
     /**
