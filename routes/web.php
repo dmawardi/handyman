@@ -73,6 +73,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'show'])->name('admin.job-requests.show');
     Route::get('/admin/job-requests/{jobRequest}/edit', [AdminJobRequestController::class, 'edit'])->name('admin.job-requests.edit');
     Route::patch('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'update'])->name('admin.job-requests.update');
+    Route::patch('/admin/job-requests/{jobRequest}/status', [AdminJobRequestController::class, 'updateStatus'])->name('admin.job-requests.update-status');
+    Route::patch('/admin/job-requests/{jobRequest}/assign', [AdminJobRequestController::class, 'assignWorker'])->name('admin.job-requests.assign-worker');
+    // Route::post('/admin/job-requests/{jobRequest}/note', [AdminJobRequestController::class, 'storeWorker'])->name('admin.job-requests.store-worker');
     Route::delete('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'destroy'])->name('admin.job-requests.destroy');
 });
 

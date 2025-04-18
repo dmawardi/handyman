@@ -48,4 +48,8 @@ class JobRequest extends Model
     
         return 'JOB-' . $timestamp . '-' . $randomNumber; // Example: ORD-20250407123045-1234
     }
+
+    protected $casts = [
+        'completion_date' => 'datetime', // ✅ Correct
+    ];
 }

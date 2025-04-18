@@ -164,8 +164,9 @@ class JobRequestController extends Controller
     {
         // Load associated user and worker
         $jobRequest->load(['requestor', 'worker']);
+        $workers = User::where('user_type', 'worker')->get();
         
-        return view('admin.job_requests.show', compact('jobRequest'));
+        return view('admin.job_requests.show', compact('jobRequest', 'workers'));
     }
 
     /**
@@ -236,7 +237,7 @@ class JobRequestController extends Controller
         // Permanently delete the job request
         $jobRequest->delete();
         
-        return redirect()->route('admin.job_requests.index')
+        return redirect()->route('admin.job-requests.index')
             ->with('success', 'Job request deleted successfully.');
     }
     
@@ -267,7 +268,7 @@ class JobRequestController extends Controller
             'worker_name' => $worker->name
         ]);
         
-        return redirect()->route('admin.job_requests.show', $jobRequest)
+        return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Worker assigned successfully.');
     }
     
