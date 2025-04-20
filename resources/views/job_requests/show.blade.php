@@ -68,6 +68,14 @@
                                     <dd class="col-span-2">{{ $jobRequest->street_address ?: 'Not provided' }}</dd>
                                 </div>
                                 <div class="grid grid-cols-3">
+                                    <dt class="font-medium text-gray-500">Suburb:</dt>
+                                    <dd class="col-span-2">{{ $jobRequest->suburb ?: 'Not provided' }}</dd>
+                                </div>
+                                <div class="grid grid-cols-3">
+                                    <dt class="font-medium text-gray-500">Area:</dt>
+                                    <dd class="col-span-2">{{ $jobRequest->area ?: 'Not provided' }}</dd>
+                                </div>
+                                <div class="grid grid-cols-3">
                                     <dt class="font-medium text-gray-500">City:</dt>
                                     <dd class="col-span-2">{{ $jobRequest->city ?: 'Not provided' }}</dd>
                                 </div>
@@ -83,6 +91,20 @@
                                 <div class="grid grid-cols-3">
                                     <dt class="font-medium text-gray-500">Location Notes:</dt>
                                     <dd class="col-span-2">{{ $jobRequest->location }}</dd>
+                                </div>
+                                @endif
+                                @if($jobRequest->latitude && $jobRequest->longitude)
+                                <div class="grid grid-cols-3 mt-2">
+                                    <dt class="font-medium text-gray-500">Map View:</dt>
+                                    <dd class="col-span-2">
+                                        <a href="https://maps.google.com/?q={{ $jobRequest->latitude }},{{ $jobRequest->longitude }}" target="_blank" class="text-blue-600 hover:underline flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            View on Google Maps
+                                        </a>
+                                    </dd>
                                 </div>
                                 @endif
                             </dl>
