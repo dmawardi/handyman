@@ -172,7 +172,13 @@ class JobRequestController extends Controller
     {
         $users = User::where('user_type', 'customer')->get();
         $workers = User::where('user_type', 'worker')->get();
-        return view('admin.job_requests.edit', compact('jobRequest', 'users', 'workers'));
+
+        return view('admin.job_requests.edit', [
+            'jobRequest' => $jobRequest, 
+            'apiKey' => env('GOOGLE_API_KEY'),
+            'users' => $users,
+            'workers' => $workers,
+            ]);
     }
 
     /**

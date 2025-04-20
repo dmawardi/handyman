@@ -51,7 +51,7 @@
                         </div>
 
                         <!-- Address Information Section -->
-                        <x-forms.partials._address :job_request="$jobRequest" />
+                        <x-forms.partials._address :jobRequest="$jobRequest" :apiKey="$apiKey" />
 
                         <!-- Job Details Section -->
                         <div class="border-b pb-4 mb-6">

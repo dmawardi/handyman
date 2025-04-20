@@ -110,7 +110,7 @@ class JobRequestController extends Controller
                 ->with('error', 'Only pending job requests can be edited.');
         }
         
-        return view('job_requests.edit', compact('jobRequest'));
+        return view('job_requests.edit', ['jobRequest' => $jobRequest, 'apiKey' => env('GOOGLE_API_KEY')]);
     }
 
     public function update(Request $request, $id)

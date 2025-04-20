@@ -1,5 +1,6 @@
 @props([
     'jobRequest' => null,
+    'apiKey' => "",
 ])
 
 <div class="border-b pb-4 mb-6">
@@ -12,7 +13,7 @@
             <x-input-error :messages="$errors->get('api_search')" class="mt-2" />
             <input type="hidden" name="latitude" id="lat" value="{{ old('latitude', $jobRequest?->latitude) }}">
             <input type="hidden" name="longitude" id="lng" value="{{ old('longitude', $jobRequest?->longitude) }}">
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFrdfPsrfDfFt4bsDRz_jBahniHYdC8T4&libraries=places"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key={{ $apiKey }}&libraries=places"></script>
             <script>
                 let autocomplete;
                 function initAutocomplete() {
