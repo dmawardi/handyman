@@ -24,11 +24,16 @@ return new class extends Migration
             $table->string('contact_email');
             $table->string('contact_phone')->nullable();
             // Address information
-            $table->string('street_address')->nullable();
+            $table->string('api_search')->nullable(); // API search result
             $table->string('state')->nullable();
-            $table->string('zip_code')->nullable();
             $table->string('city')->nullable();
+            $table->string('suburb')->nullable();
+            $table->string('area')->nullable();
+            $table->string('street_address')->nullable();
+            $table->string('zip_code')->nullable();
             $table->string('location')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             // Job details
             $table->string('job_type');
             $table->string('urgency_level');

@@ -64,14 +64,8 @@ class JobRequestController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('Admin creating job request', [
-            'data' => $request->all()
-        ]);
         // Check if the job request is made for an existing user or a new one
         if ($request->customer_type === 'existing') {
-            Log::info('Checking for existing user', [
-                'user_id' => $request->user_id
-            ]);
             // Validate for existing user
             $request->validate([
                 'user_id' => 'required|exists:users,id',
@@ -110,9 +104,6 @@ class JobRequestController extends Controller
         
         // Properly extract only the fields we need, excluding customer_type
         $validationData = $request->except(['customer_type']);
-        Log::info('Completed existing/new user check', [
-            'data' => $validationData]
-        );
         
         // Validate the filtered data
         $validated = Validator::make($validationData, [
@@ -121,11 +112,18 @@ class JobRequestController extends Controller
             'contact_email' => 'required|email|max:255',
             'contact_phone' => 'nullable|string|max:20',
             'worker_id' => 'nullable|exists:users,id',
+            // Api search result
+            'api_search' => 'nullable|string|max:255',
+            // Address information
             'street_address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
+            'suburb' => 'nullable|string|max:100',
+            'area' => 'nullable|string|max:100',
             'zip_code' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
+            'latitude' => 'nullable|string|max:255',
+            'longitude' => 'nullable|string|max:255',
             'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
@@ -148,11 +146,6 @@ class JobRequestController extends Controller
         }
         
         $jobRequest->save();
-        
-        Log::info('Admin created job request', [
-            'admin_id' => auth()->id(),
-            'job_request' => $jobRequest->toArray()
-        ]);
         
         return redirect()->route('admin.job-requests.index')
             ->with('success', 'Job request created successfully. Job number: ' . $jobNumber);
@@ -194,11 +187,18 @@ class JobRequestController extends Controller
             'contact_name' => 'required|string|max:255',
             'contact_email' => 'required|email|max:255',
             'contact_phone' => 'required|string|max:20',
+            // Api search result
+            'api_search' => 'nullable|string|max:255',
+            // Address information
             'street_address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
+            'suburb' => 'nullable|string|max:100',
+            'area' => 'nullable|string|max:100',
             'zip_code' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
+            'latitude' => 'nullable|string|max:255',
+            'longitude' => 'nullable|string|max:255',
             'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
@@ -231,12 +231,6 @@ class JobRequestController extends Controller
      */
     public function destroy(JobRequest $jobRequest)
     {
-        // Log the deletion
-        Log::info('Admin deleted job request', [
-            'admin_id' => auth()->id(),
-            'job_request' => $jobRequest->toArray()
-        ]);
-        
         // Permanently delete the job request
         $jobRequest->delete();
         
@@ -264,13 +258,6 @@ class JobRequestController extends Controller
         
         $worker = User::find($validated['worker_id']);
         
-        Log::info('Admin assigned worker to job request', [
-            'admin_id' => auth()->id(),
-            'job_request_id' => $jobRequest->id,
-            'worker_id' => $validated['worker_id'],
-            'worker_name' => $worker->name
-        ]);
-        
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Worker assigned successfully.');
     }
@@ -297,13 +284,6 @@ class JobRequestController extends Controller
         }
         
         $jobRequest->save();
-        
-        Log::info('Admin updated job request status', [
-            'admin_id' => auth()->id(),
-            'job_request_id' => $jobRequest->id,
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus
-        ]);
         
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Job request status updated successfully.');

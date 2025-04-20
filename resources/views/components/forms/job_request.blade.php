@@ -38,45 +38,7 @@
                     </div>
 
                     <!-- Address Information Section -->
-                    <div class="border-b pb-4 mb-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Address Information</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Street Address -->
-                            <div class="md:col-span-2">
-                                <x-input-label for="street_address" :value="__('Street Address')" />
-                                <x-text-input id="street_address" name="street_address" type="text" class="mt-1 block w-full" :value="old('street_address')" autocomplete="street-address" />
-                                <x-input-error :messages="$errors->get('street_address')" class="mt-2" />
-                            </div>
-
-                            <!-- City -->
-                            <div>
-                                <x-input-label for="city" :value="__('City')" />
-                                <x-text-input id="city" name="city" type="text" class="mt-1 block w-full" :value="old('city')" autocomplete="address-level2" />
-                                <x-input-error :messages="$errors->get('city')" class="mt-2" />
-                            </div>
-
-                            <!-- State -->
-                            <div>
-                                <x-input-label for="state" :value="__('State')" />
-                                <x-text-input id="state" name="state" type="text" class="mt-1 block w-full" :value="old('state')" autocomplete="address-level1" />
-                                <x-input-error :messages="$errors->get('state')" class="mt-2" />
-                            </div>
-
-                            <!-- Zip Code -->
-                            <div>
-                                <x-input-label for="zip_code" :value="__('Zip Code')" />
-                                <x-text-input id="zip_code" name="zip_code" type="text" class="mt-1 block w-full" :value="old('zip_code')" autocomplete="postal-code" />
-                                <x-input-error :messages="$errors->get('zip_code')" class="mt-2" />
-                            </div>
-
-                            <!-- Location (for precise instructions) -->
-                            <div>
-                                <x-input-label for="location" :value="__('Specific Location Details')" />
-                                <x-text-input id="location" name="location" type="text" class="mt-1 block w-full" :value="old('location')" placeholder="e.g., Back entrance, Garage, etc." />
-                                <x-input-error :messages="$errors->get('location')" class="mt-2" />
-                            </div>
-                        </div>
-                    </div>
+                    <x-forms.partials._address />
 
                     <!-- Job Details Section -->
                     <div class="border-b pb-4 mb-6">
@@ -143,3 +105,6 @@
         </div>
     </div>
 </div>
+
+
+

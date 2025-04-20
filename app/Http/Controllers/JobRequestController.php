@@ -28,10 +28,17 @@ class JobRequestController extends Controller
             'contact_email' => 'required|email|max:255',
             'contact_phone' => 'required|string|max:20',
             'street_address' => 'nullable|string|max:255',
+            // API search result
+            'api_search' => 'nullable|string|max:255',
+            // Address information
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
+            'suburb' => 'nullable|string|max:100',
+            'area' => 'nullable|string|max:100',
             'zip_code' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
+            'latitude' => 'nullable|string|max:20',
+            'longitude' => 'nullable|string|max:20',
             'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
@@ -40,10 +47,7 @@ class JobRequestController extends Controller
 
         // Find the user by email
         $user = \App\Models\User::where('email', $validated['contact_email'])->first();
-        Log::info("User lookup", [
-            'email' => $validated['contact_email'],
-            'user_found' => $user ? true : false
-        ]);
+       
         if (!$user) {
             // If the user does not exist, create a new user
             $user = new \App\Models\User();
@@ -52,19 +56,12 @@ class JobRequestController extends Controller
             $user->phone = $validated['contact_phone'];
             // Set a default password or generate one
             $user->password = bcrypt('defaultpassword'); // Use a secure password generation method in production
-            Log::info("Creating new user", $user->toArray());
             $user->save();
         }
         
         // Generate a unique job number
         $jobNumber = self::generateOrderNumber();
         
-        // Log the job request creation
-        Log::info('Job request creation initiated', [
-            'user_id' => $user->id,
-            'job_number' => $jobNumber,
-            'data' => $validated
-        ]);
         // Create the job request with the validated data
         $jobRequest = new \App\Models\JobRequest();
         $jobRequest->fill($validated);
@@ -72,12 +69,11 @@ class JobRequestController extends Controller
         $jobRequest->user_id = $user->id; // Either the found user or the newly created user
         $jobRequest->status = 'Pending';
         $jobRequest->save();
-        Log::info('Job request created', ['job_request' => $jobRequest]);
         // Send a confirmation email to the user
         // \Mail::to($validated['contact_email'])->send(new \App\Mail\JobRequestConfirmation($jobRequest));
         
         // Redirect to a confirmation page or back to dashboard
-        return redirect()->route('job-requests.index')
+        return redirect()->route('job-requests.create')
             ->with('success', 'Your job request has been submitted successfully! Your job number is: ' . $jobNumber);
     
     }
@@ -139,11 +135,18 @@ class JobRequestController extends Controller
         $validated = $request->validate([
             'contact_name' => 'required|string|max:255',
             'contact_phone' => 'required|string|max:20',
+            // API search result
+            'api_search' => 'nullable|string|max:255',
+            // Address information
             'street_address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
+            'suburb' => 'nullable|string|max:100',
+            'area' => 'nullable|string|max:100',
             'zip_code' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
+            'latitude' => 'nullable|string|max:20',
+            'longitude' => 'nullable|string|max:20',
             'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
@@ -155,7 +158,6 @@ class JobRequestController extends Controller
         // Update the job request with validated data
         $jobRequest->update($validated);
         
-        Log::info('Job request updated', ['job_request' => $jobRequest]);
         
         return redirect()->route('job-requests.show', $jobRequest->id)
             ->with('success', 'Job request updated successfully!');
@@ -182,9 +184,7 @@ class JobRequestController extends Controller
         // Change status to cancelled (soft delete)
         $jobRequest->status = 'Cancelled';
         $jobRequest->save();
-        
-        Log::info('Job request cancelled', ['job_request' => $jobRequest]);
-        
+                
         return redirect()->route('job-requests.index')
             ->with('success', 'Job request cancelled successfully.');
     }
