@@ -17,6 +17,4 @@
             apiKey="{{ env('GOOGLE_API_KEY') }}"
         />
     </x-slot>
-
-    
 </x-app-layout>

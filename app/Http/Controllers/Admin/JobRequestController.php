@@ -64,8 +64,11 @@ class JobRequestController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('JobRequestController@store', ['request' => $request->all()]);
         // Check if the job request is made for an existing user or a new one
         if ($request->customer_type === 'existing') {
+            Log::info('Existing user selected');
+            
             // Validate for existing user
             $request->validate([
                 'user_id' => 'required|exists:users,id',
@@ -79,10 +82,11 @@ class JobRequestController extends Controller
                 'contact_phone' => $user->phone,
             ]);
         } else {
+            Log::info('New user selected');
             // Else, validate for new user
             $request->validate([
                 'contact_name' => 'required|string|max:255',
-                'contact_email' => 'required|email|max:255',
+                'contact_email' => 'required|email|max:255|unique:users,email',
                 'contact_phone' => 'required|string|max:20',
             ]);
             // Create a new user
@@ -93,6 +97,7 @@ class JobRequestController extends Controller
                 'user_type' => 'customer',
                 'password' => bcrypt('defaultpassword'), // Generate random password
             ]);
+            Log::info('New user created', ['user' => $user]);
             $request->merge([
                 'user_id' => $user->id,
                 'contact_name' => $user->name,
@@ -105,6 +110,7 @@ class JobRequestController extends Controller
         // Properly extract only the fields we need, excluding customer_type
         $validationData = $request->except(['customer_type']);
         
+        Log::info('Validation data', ['validationData' => $validationData]);
         // Validate the filtered data
         $validated = Validator::make($validationData, [
             'user_id' => 'required|exists:users,id',
@@ -131,7 +137,7 @@ class JobRequestController extends Controller
             'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
             'notes' => 'nullable|string',
         ])->validate();
-        
+        Log::info('Validated data', ['validated' => $validated]);
         // Generate a unique job number
         $jobNumber = $this->generateJobNumber();
         
