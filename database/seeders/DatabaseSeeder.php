@@ -15,20 +15,27 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
 
         // Create 5 job requests for the test user
         \App\Models\JobRequest::factory(5)->create([
-            'user_id' => 1, // Assuming the test user has ID 1
+            'user_id' => $user->id, // Assuming the test user has ID 1
         ]);
         // Create 5 job updates for each job request
-        \App\Models\JobRequest::all()->each(function ($jobRequest) {
+        \App\Models\JobRequest::all()->each(function ($jobRequest, $user) {
+            // Create 5 job request images for each job request
+            \App\Models\JobRequestImage::factory(2)->create([
+                'job_request_id' => $jobRequest->id,
+                'user_id' => $user, // Assuming the test user has ID 1
+            ]);
+            // Create 5 job updates for each job request
             \App\Models\JobUpdate::factory(5)->create([
                 'job_request_id' => $jobRequest->id,
             ]);
+
         });
     }
 }
