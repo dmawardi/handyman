@@ -8,6 +8,6 @@ keywords="handyman services, plumbing, electrical work, carpentry, maintenance, 
         <p>
             {{ __('Allows users to submit a maintenance/job request. Includes fields for details, image upload, email, etc.') }}
         </p>
-        <x-forms.job_request />
     </x-slot>
+    <x-forms.job_request />
 </x-app-layout>
