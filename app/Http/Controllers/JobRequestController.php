@@ -76,29 +76,10 @@ class JobRequestController extends Controller
 
         // Handle image uploads
         if ($request->hasFile('images')) {
-            foreach ($validated['images'] as $image) {
-                // Handle S3 upload logic here
-                $path = $this->handleS3Upload($image, $jobRequest->id);
-                
-                // Create a new JobRequestImage instance
-                $jobRequestImage = new \App\Models\JobRequestImage();
-      
-                $jobRequestImage->fill([
-                    'job_request_id' => $jobRequest->id,
-                    'user_id' => $user->id,
-                    'path' => $path,
-                    'original_filename' => $image->getClientOriginalName(),
-                    'file_type' => $image->getClientMimeType(),
-                    'file_size' => $image->getSize(),
-                    'image_type' => 'user_upload',
-                    'is_visible_to_customer' => true,
-                    'is_active' => true,
-                ]);
-                
-                $jobRequestImage->save();
-            }
+            // Loop through each image, upload it to S3, and save the path
+            $this->handleImageAttachments($validated['images'], $jobRequest, $user);
         }
-
+        
         // Send a confirmation email to the user
         // \Mail::to($validated['contact_email'])->send(new \App\Mail\JobRequestConfirmation($jobRequest));
         
@@ -219,15 +200,9 @@ class JobRequestController extends Controller
             ->with('success', 'Job request cancelled successfully.');
     }
 
-    private function handleS3Upload($file, $jobRequestId)
-    {
-        // Handle S3 upload logic here
-        $path = $file->store('job-requests/' . $jobRequestId . "/user-uploads" , 's3');
-        return $path;
-    }
-
-
-
+    
+    
+    
     // Helper Methods
     /**
      * Generate a unique job request number.
@@ -240,7 +215,42 @@ class JobRequestController extends Controller
         // Use the current timestamp and a random number to ensure uniqueness
         $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
         $randomNumber = mt_rand(1000, 9999); // Generate a random 4-digit number
-    
+        
         return 'JOB-' . $timestamp . '-' . $randomNumber; // Example: ORD-20250407123045-1234
     }
+    // This method handles the S3 upload of an image
+    private function handleS3Upload($file, $jobRequestId)
+    {
+        // Handle S3 upload logic here
+        $path = $file->store('job-requests/' . $jobRequestId . "/user-uploads" , 's3');
+        return $path;
+    }
+    // This method takes the validated request, the job request object, and user
+    // and handles the image attachments
+    private function handleImageAttachments($requestImages, $jobRequest, $user)
+    {
+        // Check if the request has images
+        foreach ($requestImages as $image) {
+            // Handle S3 upload logic here
+            $path = $this->handleS3Upload($image, $jobRequest->id);
+            
+            // Create a new JobRequestImage instance
+            $jobRequestImage = new \App\Models\JobRequestImage();
+    
+            $jobRequestImage->fill([
+                'job_request_id' => $jobRequest->id,
+                'user_id' => $user->id,
+                'path' => $path,
+                'original_filename' => $image->getClientOriginalName(),
+                'file_type' => $image->getClientMimeType(),
+                'file_size' => $image->getSize(),
+                'image_type' => 'user_upload',
+                'is_visible_to_customer' => true,
+                'is_active' => true,
+            ]);
+            
+            $jobRequestImage->save();
+        }
+    }
+    
 }
