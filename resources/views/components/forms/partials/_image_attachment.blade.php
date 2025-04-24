@@ -11,12 +11,10 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     @foreach($jobRequest->images as $image)
                         <div class="relative group">
-                            <img src="{{ $image->getSrc() }}" alt="Attachment" class="w-full h-32 object-cover rounded-md shadow">
-                            @if(auth()->user()->user_type === 'admin')
-                                <button type="button" class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded shadow group-hover:opacity-100 opacity-0 transition-opacity duration-200" onclick="removeImage('{{ $image->id }}')">
+                            <img src="{{ $image->getSrc() }}" alt="Attachment" data-id={{ $image->id }} class="existing-images w-full h-32 object-cover rounded-md shadow">
+                                <button type="button" class="existing-images absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded shadow group-hover:opacity-100 opacity-0 transition-opacity duration-200" onclick="removeImage('{{ $image->id }}')">
                                     Remove
                                 </button>
-                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -34,6 +32,8 @@
                 <x-input-error :messages="$error" class="mt-2" />
             @endforeach
             <p class="mt-1 text-xs text-gray-500">You can upload multiple images. Accepted formats: JPG, PNG, GIF.</p>
+            {{-- Delete image hidden input --}}
+            <input type="hidden" name="delete_images[]" id="delete_images" value="">
         </div>
 
         <!-- Preview New Images -->
@@ -84,13 +84,85 @@
         });
     });
 
-    // Function to handle image removal
-    // This function should be called when the remove button is clicked
+    // This function should be called when the page loads to mark existing images for removal
+    function markExistingImagesBasedOnDeleteImages() {
+        // Grab the existing images
+        const existingImages = document.querySelectorAll('img[class~="existing-images"]');
+        // Get the delete_images input value
+        const deleteImagesInput = document.querySelector('input[name="delete_images[]"]');
+        const deleteImagesArray = deleteImagesInput.value.split(',').map(id => id.trim());
+
+
+        // Loop through existing images and mark them if the id is in the delete_images array
+        existingImages.forEach(image => {
+            // Get the image ID from the data-id attribute
+            const imageId = image.getAttribute('data-id');
+
+            // Based on if the image ID is in the delete_images array, change the appearance
+            changeAppearanceOfImagePreview(image, image.nextElementSibling, deleteImagesArray.includes(imageId));
+        });
+    }
+    // Function to handle image removal by adding it to the delete_images array
     function removeImage(imageId) {
         // Confirm the removal action with prompt
         if (confirm('Are you sure you want to remove this image?')) {
-            // Remove the image from the DOM and form data
-            
+            // Grab the delete_images input
+            const deleteImagesInput = document.querySelector('input[name="delete_images[]"]');
+            // Get the current value of delete_images
+            let currentDeleteImages = deleteImagesInput.value ? deleteImagesInput.value.split(',') : [];
+            // Add the image ID to the delete_images array
+            if (!currentDeleteImages.includes(imageId)) {
+                currentDeleteImages.push(imageId);
+            }
+            // Update the delete_images input value
+            deleteImagesInput.value = currentDeleteImages.join(',');
+
+            markExistingImagesBasedOnDeleteImages(); // Call the function to update the UI
+        }
+    }
+    // Function to handle image restoration by removing it from the delete_images array
+    function restoreImage(imageId) {
+        // Grab the delete_images input
+        const deleteImagesInput = document.querySelector('input[name="delete_images[]"]');
+        // Get the current value of delete_images
+        let currentDeleteImages = deleteImagesInput.value ? deleteImagesInput.value.split(',') : [];
+        // Remove the image ID from the delete_images array
+        currentDeleteImages = currentDeleteImages.filter(id => id !== imageId);
+        // Update the delete_images input value
+        deleteImagesInput.value = currentDeleteImages.join(',');
+
+        markExistingImagesBasedOnDeleteImages(); // Call the function to update the UI
+    }
+    // Toggle the opacity of an image element
+    function changeAppearanceOfImagePreview(imageElement, buttonElement, markAsDelete) {
+        // If the image needs to be marked as delete, set classes and styles accordingly
+        if (markAsDelete) {
+            imageElement.style.opacity = '0.5';
+            // change button text and color
+            buttonElement.classList.remove('bg-red-600');
+            buttonElement.classList.add('bg-green-600');
+            buttonElement.innerText = 'Restore';
+            // Remove the existing onclick event to prevent multiple calls
+            buttonElement.onclick = null;
+            // Add event listener to restore the image
+            buttonElement.onclick = function () {
+                restoreImage(imageElement.getAttribute('data-id'));
+            };
+
+        // If the image is not marked for delete, reset classes and styles
+        } else {
+            imageElement.style.opacity = '1';
+            // change button text and color
+            buttonElement.classList.remove('bg-green-600');
+            buttonElement.classList.add('bg-red-600');
+            buttonElement.innerText = 'Remove';
+
+            // Remove the existing onclick event to prevent multiple calls
+            buttonElement.onclick = null;
+            // Add event listener to restore the image
+            buttonElement.onclick = function () {
+                removeImage(imageElement.getAttribute('data-id'));
+            };
         }
     }
 </script>

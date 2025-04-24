@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class JobRequestController extends Controller
 {
@@ -163,11 +164,13 @@ class JobRequestController extends Controller
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'required|string',
             'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate images
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'exists:job_request_images,id', // Validate image IDs for deletion
         ]);
         // Note: We don't allow changing the email as it's tied to user identity
 
         // Remove images from validated data for job request creation
-        $dataForJobRequest = collect($validated)->except(['images'])->toArray();
+        $dataForJobRequest = collect($validated)->except(['images', 'delete_images'])->toArray();
 
         // Update the job request with validated data
         $jobRequest->update($dataForJobRequest);
@@ -176,6 +179,11 @@ class JobRequestController extends Controller
         if ($request->hasFile('images')) {
             // Loop through each image, upload it to S3, and save the path
             $this->handleImageAttachments($validated['images'], $jobRequest, $loggedInUser);
+        }
+
+        // Handle image deletions
+        if ($request->has('delete_images')) {
+            $this->handleImageAtachmentDeletions($validated['delete_images']);
         }
         
         
@@ -261,5 +269,20 @@ class JobRequestController extends Controller
             $jobRequestImage->save();
         }
     }
-    
+    // Takes a list of IDs and an image ID
+    private function handleImageAtachmentDeletions($listOfIds)
+    {
+        foreach($listOfIds as $id) {
+            // Find the image by ID
+            $image = \App\Models\JobRequestImage::findOrFail($id);
+            
+            // Delete the image from S3
+            if ($image->path) {
+                Storage::disk('s3')->delete($image->path);
+            }
+            
+            // Delete the image record from the database
+            $image->delete();
+        }
+    }
 }
