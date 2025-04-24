@@ -104,7 +104,7 @@ class JobRequestController extends Controller
         
         // Redirect to a confirmation page or back to dashboard
         return redirect()->route('job-requests.create')
-            ->with('success', 'Your job request has been submitted successfully! Your job number is: ' . $jobNumber);
+            ->with('success', 'Your job request has been submitted successfully! Your job number is: ' . $jobRequest->job_number);
     
     }
 
@@ -222,7 +222,6 @@ class JobRequestController extends Controller
     private function handleS3Upload($file, $jobRequestId)
     {
         // Handle S3 upload logic here
-        // For example, using Laravel's Storage facade
         $path = $file->store('job-requests/' . $jobRequestId . "/user-uploads" , 's3');
         return $path;
     }
