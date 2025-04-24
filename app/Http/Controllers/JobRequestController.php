@@ -162,12 +162,21 @@ class JobRequestController extends Controller
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'required|string',
+            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate images
         ]);
-        
         // Note: We don't allow changing the email as it's tied to user identity
-        
+
+        // Remove images from validated data for job request creation
+        $dataForJobRequest = collect($validated)->except(['images'])->toArray();
+
         // Update the job request with validated data
-        $jobRequest->update($validated);
+        $jobRequest->update($dataForJobRequest);
+
+        // Handle image uploads
+        if ($request->hasFile('images')) {
+            // Loop through each image, upload it to S3, and save the path
+            $this->handleImageAttachments($validated['images'], $jobRequest, $loggedInUser);
+        }
         
         
         return redirect()->route('job-requests.show', $jobRequest->id)
