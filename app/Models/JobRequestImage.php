@@ -24,4 +24,10 @@ class JobRequestImage extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getSrc()
+    {
+        // Return the URL of the image using AWS s3
+        return \Illuminate\Support\Facades\Storage::disk('s3')->url($this->path);
+    }
 }

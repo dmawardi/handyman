@@ -43,6 +43,7 @@ class JobRequestController extends Controller
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'required|string',
+            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate images
         ]);
 
         // Find the user by email
@@ -62,13 +63,42 @@ class JobRequestController extends Controller
         // Generate a unique job number
         $jobNumber = self::generateOrderNumber();
         
+        // Remove images from validated data for job request creation
+        $dataForJobRequest = collect($validated)->except(['images'])->toArray();
+
         // Create the job request with the validated data
         $jobRequest = new \App\Models\JobRequest();
-        $jobRequest->fill($validated);
+        $jobRequest->fill($dataForJobRequest);
         $jobRequest->job_number = $jobNumber;
         $jobRequest->user_id = $user->id; // Either the found user or the newly created user
         $jobRequest->status = 'Pending';
         $jobRequest->save();
+
+        // Handle image uploads
+        if ($request->hasFile('images')) {
+            foreach ($validated['images'] as $image) {
+                // Handle S3 upload logic here
+                $path = $this->handleS3Upload($image, $jobRequest->id);
+                
+                // Create a new JobRequestImage instance
+                $jobRequestImage = new \App\Models\JobRequestImage();
+      
+                $jobRequestImage->fill([
+                    'job_request_id' => $jobRequest->id,
+                    'user_id' => $user->id,
+                    'path' => $path,
+                    'original_filename' => $image->getClientOriginalName(),
+                    'file_type' => $image->getClientMimeType(),
+                    'file_size' => $image->getSize(),
+                    'image_type' => 'user_upload',
+                    'is_visible_to_customer' => true,
+                    'is_active' => true,
+                ]);
+                
+                $jobRequestImage->save();
+            }
+        }
+
         // Send a confirmation email to the user
         // \Mail::to($validated['contact_email'])->send(new \App\Mail\JobRequestConfirmation($jobRequest));
         
@@ -83,7 +113,7 @@ class JobRequestController extends Controller
         // Fetch the user and check user type
         $loggedInUser = auth()->user();
         // Logic to show a specific job request
-        $jobRequest = \App\Models\JobRequest::findOrFail($id);
+        $jobRequest = \App\Models\JobRequest::findOrFail($id)->load('images');
         // Check if the job request belongs to the logged-in user
         if ($jobRequest->user_id !== $loggedInUser->id) {
             // If the job request does not belong to the logged-in user
@@ -187,6 +217,14 @@ class JobRequestController extends Controller
                 
         return redirect()->route('job-requests.index')
             ->with('success', 'Job request cancelled successfully.');
+    }
+
+    private function handleS3Upload($file, $jobRequestId)
+    {
+        // Handle S3 upload logic here
+        // For example, using Laravel's Storage facade
+        $path = $file->store('job-requests/' . $jobRequestId . "/user-uploads" , 's3');
+        return $path;
     }
 
 

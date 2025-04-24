@@ -149,6 +149,26 @@
                                 </div>
                             </dl>
                         </div>
+
+                        <!-- Image Attachments -->
+                        <div class="md:col-span-2">
+                            <h4 class="text-lg font-medium text-gray-900 mb-4">Image Attachments</h4>
+                            @if($jobRequest->images && count($jobRequest->images) > 0)
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    @foreach($jobRequest->images as $image)
+                                        <div class="relative group">
+                                            <img src="{{ $image->getSrc() }}" alt="Attachment" class="w-full h-32 object-cover rounded-md shadow">
+                                            @if(auth()->user()->user_type === 'admin')
+                                                <button type="button" class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded shadow group-hover:opacity-100 opacity-0 transition-opacity duration-200" onclick="removeImage('{{ $image->id }}')">
+                                                    Remove
+                                                </button>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-gray-500">No images attached.</p>
+                            @endif
                     </div>
 
                     <!-- Actions -->

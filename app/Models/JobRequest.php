@@ -23,6 +23,11 @@ class JobRequest extends Model
         return $this->belongsTo(User::class, 'worker_id');
     }
 
+    public function images()
+    {
+        return $this->hasMany(JobRequestImage::class);
+    }
+
     public function noteUpdates()
     {
         return $this->hasMany(JobUpdate::class);
