@@ -37,7 +37,12 @@
                             
                             <!-- Caption -->
                             <td class="px-4 py-3">
-                                <div class="text-sm text-gray-900 max-w-xs truncate">{{ $attachment->caption ?: 'No caption' }}</div>
+                                    <form action="{{ route('job-requests.attachments.update', $attachment->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="action" value="update_caption">
+                                        <input type="text" name="caption" value="{{ $attachment->caption }}" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full" placeholder="Enter caption" onchange="this.form.submit()">
+                                    </form>
                             </td>
                             
                             <!-- Image Type -->
