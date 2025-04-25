@@ -257,8 +257,12 @@
                                     <p class="text-gray-500 italic">No internal notes have been added yet.</p>
                                 @endif
                             </div>
-                            
-                            {{-- Print the note updates --}}
+                        </div>
+
+                        <x-admin.partials._job_request_attachments :attachments="$jobRequest->images" />
+
+                        {{-- Print the note updates --}}
+                        <div class="md:col-span-2">
                             <h4 class="text-lg font-medium text-gray-900 mb-4">Note Updates</h4>
                             @if($jobRequest->noteUpdates->isNotEmpty())
                                 <div class="overflow-y-auto max-h-64 border border-gray-200 rounded-md p-2" id="note-updates-container">
