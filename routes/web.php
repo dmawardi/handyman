@@ -81,6 +81,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Attachment routes
     Route::patch('/job-requests/attachments/{attachment}', [JobRequestAttachmentController::class, 'update'])->name('job-requests.attachments.update');
     Route::delete('/job-requests/attachments/{attachment}', [JobRequestAttachmentController::class, 'destroy'])->name('job-requests.attachments.destroy');
+    Route::post('/job-requests/attachments', [JobRequestAttachmentController::class, 'store'])->name('job-requests.attachments.store');
 });
 
 require __DIR__.'/auth.php';

@@ -1,10 +1,10 @@
 @props([
-    'attachments' => $attachments,
+    'jobRequest' => null,
 ])
 {{-- Image attachments --}}
 <div class="md:col-span-2">
     <h4 class="text-lg font-medium text-gray-900 mb-4">Attachments</h4>
-    @if($attachments->isNotEmpty())
+    @if($jobRequest && $jobRequest->images && $jobRequest->images->isNotEmpty())
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -18,7 +18,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($attachments as $attachment)
+                    @foreach($jobRequest->images as $attachment)
                         <tr>
                             <!-- Image Preview -->
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -105,4 +105,28 @@
     @else
         <p class="text-gray-500 italic">No attachments available.</p>
     @endif
+    {{-- Input to add attachments --}}
+    <div class="mt-4">
+        <form action="{{ route('job-requests.attachments.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="job_request_id" value="{{ $jobRequest->id }}">
+            {{-- Caption input --}}
+            <x-input-label for="caption" value="Caption" class="block text-sm font-medium text-gray-700 mb-1" />
+            <x-text-input id="caption" name="caption" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Enter caption" />
+            {{-- Select image type --}}
+            <select name="image_type" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <option value="user_upload" {{ $attachment->image_type === 'user_upload' ? 'selected' : '' }}>User Upload</option>
+                <option value="admin_upload" {{ $attachment->image_type === 'admin_upload' ? 'selected' : '' }}>Admin Upload</option>
+                <option value="internal" {{ $attachment->image_type === 'internal' ? 'selected' : '' }}>Internal</option>
+                <option value="document" {{ $attachment->image_type === 'document' ? 'selected' : '' }}>Document</option>
+                <option value="billing" {{ $attachment->image_type === 'billing' ? 'selected' : '' }}>Billing</option>
+                <option value="image" {{ $attachment->image_type === 'image' ? 'selected' : '' }}>Image</option>
+            </select>
+            {{-- File input --}}
+            <input type="file" name="attachments[]" multiple class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            <button type="submit" class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Upload Attachments
+            </button>
+        </form>
+    </div>
 </div>
