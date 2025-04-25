@@ -159,6 +159,8 @@ class JobRequestController extends Controller
         // Load associated user and worker
         $jobRequest->load(['requestor', 'worker', 'noteUpdates' => function ($query) {
             $query->orderBy('created_at', 'asc');
+        }, 'images'=> function ($query) {
+            $query->orderBy('created_at', 'desc');
         }]);
         $workers = User::where('user_type', 'worker')->get();
         
