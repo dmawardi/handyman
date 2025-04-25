@@ -5,6 +5,7 @@ use App\Http\Controllers\JobRequestController;
 use App\Http\Controllers\Admin\JobRequestController as AdminJobRequestController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\JobRequestAttachmentController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -22,7 +23,7 @@ Route::get('/services', function () {
 Route::get('/job-requests/create', [JobRequestController::class, 'create'])->name('job-requests.create');
 Route::post('/job-requests', [JobRequestController::class, 'store'])->name('job-requests.store');
 
-// Authentication routes
+// Authenticated routes
 Route::middleware('auth')->group(function () {
     // Job request routes
     Route::get('/job-requests', [JobRequestController::class, 'index'])->name('job-requests.index');
@@ -76,6 +77,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/admin/job-requests/{jobRequest}/assign', [AdminJobRequestController::class, 'assignWorker'])->name('admin.job-requests.assign-worker');
     Route::post('/admin/job-requests/{jobRequest}/notes', [AdminJobRequestController::class, 'addNotes'])->name('admin.job-requests.add-update');
     Route::delete('/admin/job-requests/{jobRequest}', [AdminJobRequestController::class, 'destroy'])->name('admin.job-requests.destroy');
+
+    // Attachment routes
+    Route::patch('/job-requests/attachments/{attachment}', [JobRequestAttachmentController::class, 'update'])->name('job-requests.attachments.update');
+    Route::delete('/job-requests/attachments/{attachment}', [JobRequestAttachmentController::class, 'destroy'])->name('job-requests.attachments.destroy');
 });
 
 require __DIR__.'/auth.php';

@@ -43,13 +43,19 @@
                             <!-- Image Type -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 @if(auth()->user()->user_type === 'admin')
-                                    <select class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
-                                            onchange="updateImageType('{{ $attachment->id }}', this.value)">
-                                        <option value="user_upload" {{ $attachment->image_type === 'user_upload' ? 'selected' : '' }}>User Upload</option>
-                                        <option value="worker_upload" {{ $attachment->image_type === 'worker_upload' ? 'selected' : '' }}>Worker Upload</option>
-                                        <option value="completion_proof" {{ $attachment->image_type === 'completion_proof' ? 'selected' : '' }}>Completion Proof</option>
-                                        <option value="admin_upload" {{ $attachment->image_type === 'admin_upload' ? 'selected' : '' }}>Admin Upload</option>
-                                    </select>
+                                    <form action="{{ route('job-requests.attachments.update', $attachment->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="action" value="update_type">
+                                        <select name="image_type" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" onchange="this.form.submit()">
+                                            <option value="user_upload" {{ $attachment->image_type === 'user_upload' ? 'selected' : '' }}>User Upload</option>
+                                            <option value="admin_upload" {{ $attachment->image_type === 'admin_upload' ? 'selected' : '' }}>Admin Upload</option>
+                                            <option value="internal" {{ $attachment->image_type === 'internal' ? 'selected' : '' }}>Internal</option>
+                                            <option value="document" {{ $attachment->image_type === 'document' ? 'selected' : '' }}>Document</option>
+                                            <option value="billing" {{ $attachment->image_type === 'billing' ? 'selected' : '' }}>Billing</option>
+                                            <option value="image" {{ $attachment->image_type === 'image' ? 'selected' : '' }}>Image</option>
+                                        </select>
+                                    </form>
                                 @else
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                         {{ ucfirst(str_replace('_', ' ', $attachment->image_type)) }}
@@ -60,11 +66,15 @@
                             <!-- Visibility Toggle -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 @if(auth()->user()->user_type === 'admin')
-                                    <button type="button" 
-                                            onclick="toggleVisibility('{{ $attachment->id }}', {{ $attachment->is_visible_to_customer ? 'false' : 'true' }})"
-                                            class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded {{ $attachment->is_visible_to_customer ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $attachment->is_visible_to_customer ? 'Visible to Customer' : 'Hidden from Customer' }}
-                                    </button>
+                                    <form action="{{ route('job-requests.attachments.update', $attachment->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="action" value="toggle_visibility">
+                                        <input type="hidden" name="is_visible_to_customer" value="{{ $attachment->is_visible_to_customer ? '0' : '1' }}">
+                                        <button type="submit" class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded {{ $attachment->is_visible_to_customer ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                            {{ $attachment->is_visible_to_customer ? 'Visible to Customer' : 'Hidden from Customer' }}
+                                        </button>
+                                    </form>
                                 @else
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $attachment->is_visible_to_customer ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                         {{ $attachment->is_visible_to_customer ? 'Visible to Customer' : 'Hidden from Customer' }}
@@ -82,11 +92,15 @@
                                     </a>
                                     
                                     @if(auth()->user()->user_type === 'admin')
-                                        <button type="button" onclick="removeImage('{{ $attachment->id }}')" class="text-red-600 hover:text-red-900">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
+                                        <form action="{{ route('job-requests.attachments.destroy', $attachment->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this image?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </td>
