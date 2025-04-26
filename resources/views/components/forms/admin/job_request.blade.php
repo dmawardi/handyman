@@ -53,7 +53,7 @@
                     <x-forms.admin.partials._job_details :jobRequest="$jobRequest" />
 
                     <!-- Image Attachments Section -->
-                    {{-- <x-forms.partials._image-attachment :jobRequest="$jobRequest" /> --}}
+                    <x-forms.partials._image_attachment />
 
                     <!-- Submit Button -->
                     <div class="flex items-center justify-end space-x-4">

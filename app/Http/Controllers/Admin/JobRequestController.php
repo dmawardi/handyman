@@ -131,8 +131,8 @@ class JobRequestController extends Controller
             'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
             'notes' => 'nullable|string',
             // attachments
-            'attachments' => 'nullable|array',
-            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5048', // 2MB max size
+            'images' => 'nullable|array',
+            'images.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5048', // 2MB max size
         ])->validate();
 
         // Generate a unique job number
@@ -140,7 +140,27 @@ class JobRequestController extends Controller
         
         // Create the job request
         $jobRequest = new JobRequest();
-        $jobRequest->fill($validated);
+        $jobRequest->user_id = $validated['user_id'];
+        $jobRequest->contact_name = $validated['contact_name'];
+        $jobRequest->contact_email = $validated['contact_email'];
+        $jobRequest->contact_phone = $validated['contact_phone'];
+        $jobRequest->worker_id = $validated['worker_id'] ?? null;
+        $jobRequest->api_search = $validated['api_search'] ?? null;
+        $jobRequest->street_address = $validated['street_address'] ?? null;
+        $jobRequest->city = $validated['city'] ?? null;
+        $jobRequest->state = $validated['state'] ?? null;
+        $jobRequest->suburb = $validated['suburb'] ?? null;
+        $jobRequest->area = $validated['area'] ?? null;
+        $jobRequest->zip_code = $validated['zip_code'] ?? null;
+        $jobRequest->location = $validated['location'] ?? null;
+        $jobRequest->latitude = $validated['latitude'] ?? null;
+        $jobRequest->longitude = $validated['longitude'] ?? null;
+        $jobRequest->job_type = $validated['job_type'];
+        $jobRequest->urgency_level = $validated['urgency_level'];
+        $jobRequest->job_budget = $validated['job_budget'] ?? null;
+        $jobRequest->job_description = $validated['job_description'];
+        $jobRequest->status = $validated['status'];
+        $jobRequest->notes = $validated['notes'] ?? null;
         $jobRequest->job_number = $jobNumber;
         
         // Set completion date if status is Completed
@@ -151,9 +171,9 @@ class JobRequestController extends Controller
         $jobRequest->save();
 
         // Handle attachment uploads
-        if ($request->hasFile('attachments')) {
+        if ($request->hasFile('images')) {
             // Loop through each image, upload it to S3, and save the path
-            $this->handleAttachments($validated['attachments'], $jobRequest, $user);
+            $this->handleAttachments($validated['images'], $jobRequest, $user);
         }
         
         return redirect()->route('admin.job-requests.index')
