@@ -130,6 +130,9 @@ class JobRequestController extends Controller
             'job_description' => 'required|string',
             'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
             'notes' => 'nullable|string',
+            // attachments
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5048', // 2MB max size
         ])->validate();
 
         // Generate a unique job number
@@ -146,6 +149,12 @@ class JobRequestController extends Controller
         }
         
         $jobRequest->save();
+
+        // Handle attachment uploads
+        if ($request->hasFile('attachments')) {
+            // Loop through each image, upload it to S3, and save the path
+            $this->handleAttachments($validated['attachments'], $jobRequest, $user);
+        }
         
         return redirect()->route('admin.job-requests.index')
             ->with('success', 'Job request created successfully. Job number: ' . $jobNumber);
@@ -326,5 +335,42 @@ class JobRequestController extends Controller
         $randomNumber = mt_rand(1000, 9999);
         
         return 'JOB-' . $timestamp . '-' . $randomNumber;
+    }
+    // This method handles the S3 upload of an image
+    private function handleS3Upload($file, $jobRequestId)
+    {
+        // Handle S3 upload logic here
+        $path = $file->store('job-requests/' . $jobRequestId . "/user-uploads" , 's3');
+        return $path;
+    }
+    // This method takes the validated request, the job request object, and user
+    // and handles the image attachments
+    private function handleAttachments($requestAttachments, $jobRequest, $user)
+    {
+        // Check if the request has images
+        if ($requestAttachments) {
+            // Loop through each image, upload it to S3, and save the path
+            foreach ($requestAttachments as $image) {
+                // Handle S3 upload logic here
+                $path = $this->handleS3Upload($image, $jobRequest->id);
+                
+                // Create a new JobRequestImage instance
+                $jobRequestImage = new \App\Models\JobRequestImage();
+        
+                $jobRequestImage->fill([
+                    'job_request_id' => $jobRequest->id,
+                    'user_id' => $user->id,
+                    'path' => $path,
+                    'original_filename' => $image->getClientOriginalName(),
+                    'file_type' => $image->getClientMimeType(),
+                    'file_size' => $image->getSize(),
+                    'image_type' => 'user_upload',
+                    'is_visible_to_customer' => true,
+                    'is_active' => true,
+                ]);
+                
+                $jobRequestImage->save();
+            }
+        }
     }
 }

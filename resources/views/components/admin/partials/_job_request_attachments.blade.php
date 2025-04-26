@@ -115,12 +115,12 @@
             <x-text-input id="caption" name="caption" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Enter caption" />
             {{-- Select image type --}}
             <select name="image_type" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                <option value="user_upload" {{ $attachment->image_type === 'user_upload' ? 'selected' : '' }}>User Upload</option>
-                <option value="admin_upload" {{ $attachment->image_type === 'admin_upload' ? 'selected' : '' }}>Admin Upload</option>
-                <option value="internal" {{ $attachment->image_type === 'internal' ? 'selected' : '' }}>Internal</option>
-                <option value="document" {{ $attachment->image_type === 'document' ? 'selected' : '' }}>Document</option>
-                <option value="billing" {{ $attachment->image_type === 'billing' ? 'selected' : '' }}>Billing</option>
-                <option value="image" {{ $attachment->image_type === 'image' ? 'selected' : '' }}>Image</option>
+                <option value="user_upload">User Upload</option>
+                <option value="admin_upload">Admin Upload</option>
+                <option value="internal">Internal</option>
+                <option value="document">Document</option>
+                <option value="billing">Billing</option>
+                <option value="image">Image</option>
             </select>
             {{-- File input --}}
             <input type="file" name="attachments[]" multiple class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
