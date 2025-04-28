@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         // Create 5 job updates for each job request
         \App\Models\JobRequest::all()->each(function ($jobRequest, $user) {
             // Create 5 job request images for each job request
-            \App\Models\JobRequestImage::factory(2)->create([
+            \App\Models\JobRequestAttachment::factory(2)->create([
                 'job_request_id' => $jobRequest->id,
                 'user_id' => $user, // Assuming the test user has ID 1
             ]);

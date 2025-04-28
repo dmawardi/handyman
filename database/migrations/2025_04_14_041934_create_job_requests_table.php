@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('job_type');
             $table->string('urgency_level');
             $table->integer('job_budget')->nullable();
-            $table->string('job_description');
+            $table->text('job_description');
             // Internal Use
             $table->dateTime('completion_date')->nullable(); // Date when the job was completed
             $table->string('status')->default('Pending'); // Pending, In Progress, Completed, Cancelled
