@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\JobRequestImage;
+use App\Models\JobRequestAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +14,7 @@ class JobRequestAttachmentController extends Controller
         // Validate the request
         $request->validate([
             'job_request_id' => 'required|exists:job_requests,id',
-            'image_type' => 'nullable|in:user_upload,admin_upload,internal,document,billing,image',
+            'type' => 'nullable|in:user_upload,admin_upload,internal,document,billing,image',
             'caption' => 'nullable|string|max:255',
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,webp|max:2048',
@@ -24,7 +24,7 @@ class JobRequestAttachmentController extends Controller
             $request->file('attachments'), 
             $request->input('job_request_id'), 
             auth()->user(), 
-            $request->input('image_type'), 
+            $request->input('type'), 
             $request->input('caption')
         );
 
@@ -34,20 +34,20 @@ class JobRequestAttachmentController extends Controller
     {
         // Validate the request
         $request->validate([
-            'image_type' => 'nullable|in:user_upload,admin_upload,internal,document,billing,image',
+            'type' => 'nullable|in:user_upload,admin_upload,internal,document,billing,image',
             'caption' => 'nullable|string|max:255',
             'is_visible_to_customer' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
         ]);
 
         // Find the attachment by ID
-        $attachment = JobRequestImage::findOrFail($id);
+        $attachment = JobRequestAttachment::findOrFail($id);
         // Check the job request to ensure the user has permission to update it
         $jobRequest = $attachment->jobRequest;
         self::blockIfNotAdminOrAssignedWorker($jobRequest);
 
         // Update the attachment details
-        $attachment->image_type = $request->input('image_type', $attachment->image_type);
+        $attachment->type = $request->input('type', $attachment->type);
         $attachment->caption = $request->input('caption', $attachment->caption);
         $attachment->is_visible_to_customer = $request->input('is_visible_to_customer', $attachment->is_visible_to_customer);
         $attachment->is_active = $request->input('is_active', $attachment->is_active);
@@ -60,7 +60,7 @@ class JobRequestAttachmentController extends Controller
     public function destroy($id)
     {
         // Find the attachment by ID
-        $attachment = JobRequestImage::findOrFail($id);
+        $attachment = JobRequestAttachment::findOrFail($id);
 
         // Check the job request to ensure the user has permission to delete it
         $jobRequest = $attachment->jobRequest;
@@ -108,10 +108,10 @@ class JobRequestAttachmentController extends Controller
             // Handle S3 upload logic here
             $path = $this->handleS3Upload($image, $jobRequestId, $attachmentType);
             
-            // Create a new JobRequestImage instance
-            $jobRequestImage = new \App\Models\JobRequestImage();
+            // Create a new JobRequestAttachment instance
+            $jobRequestAttachment = new \App\Models\JobRequestAttachment();
     
-            $jobRequestImage->fill([
+            $jobRequestAttachment->fill([
                 'job_request_id' => $jobRequestId,
                 'user_id' => $user->id,
                 'path' => $path,
@@ -119,12 +119,12 @@ class JobRequestAttachmentController extends Controller
                 'original_filename' => $image->getClientOriginalName(),
                 'file_type' => $image->getClientMimeType(),
                 'file_size' => $image->getSize(),
-                'image_type' => $attachmentType,
+                'type' => $attachmentType,
                 'is_visible_to_customer' => true,
                 'is_active' => true,
             ]);
             
-            $jobRequestImage->save();
+            $jobRequestAttachment->save();
         }
     }
 }

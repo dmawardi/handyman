@@ -4,7 +4,7 @@
 {{-- Image attachments --}}
 <div class="md:col-span-2">
     <h4 class="text-lg font-medium text-gray-900 mb-4">Attachments</h4>
-    @if($jobRequest && $jobRequest->images && $jobRequest->images->isNotEmpty())
+    @if($jobRequest && $jobRequest->attachments && $jobRequest->attachments->isNotEmpty())
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -18,12 +18,12 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($jobRequest->images as $attachment)
+                    @foreach($jobRequest->attachments as $attachment)
                         <tr>
                             <!-- Image Preview -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <a href="{{ $attachment->getSrc() }}" target="_blank" class="block w-24 h-24 overflow-hidden rounded-md shadow">
-                                    <img src="{{ $attachment->getSrc() }}" alt="{{ $attachment->caption ?? 'Job image' }}" class="w-full h-full object-cover">
+                                    <img src="{{ $attachment->getSrc() }}" alt="{{ $attachment->caption ?? 'Job attachment' }}" class="w-full h-full object-cover">
                                 </a>
                             </td>
                             
@@ -51,13 +51,13 @@
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="action" value="update_type">
-                                    <select name="image_type" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" onchange="this.form.submit()">
-                                        <option value="user_upload" {{ $attachment->image_type === 'user_upload' ? 'selected' : '' }}>User Upload</option>
-                                        <option value="admin_upload" {{ $attachment->image_type === 'admin_upload' ? 'selected' : '' }}>Admin Upload</option>
-                                        <option value="internal" {{ $attachment->image_type === 'internal' ? 'selected' : '' }}>Internal</option>
-                                        <option value="document" {{ $attachment->image_type === 'document' ? 'selected' : '' }}>Document</option>
-                                        <option value="billing" {{ $attachment->image_type === 'billing' ? 'selected' : '' }}>Billing</option>
-                                        <option value="image" {{ $attachment->image_type === 'image' ? 'selected' : '' }}>Image</option>
+                                    <select name="type" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" onchange="this.form.submit()">
+                                        <option value="user_upload" {{ $attachment->type === 'user_upload' ? 'selected' : '' }}>User Upload</option>
+                                        <option value="admin_upload" {{ $attachment->type === 'admin_upload' ? 'selected' : '' }}>Admin Upload</option>
+                                        <option value="internal" {{ $attachment->type === 'internal' ? 'selected' : '' }}>Internal</option>
+                                        <option value="document" {{ $attachment->type === 'document' ? 'selected' : '' }}>Document</option>
+                                        <option value="billing" {{ $attachment->type === 'billing' ? 'selected' : '' }}>Billing</option>
+                                        <option value="image" {{ $attachment->type === 'image' ? 'selected' : '' }}>Image</option>
                                     </select>
                                 </form>
                             </td>
@@ -114,7 +114,7 @@
             <x-input-label for="caption" value="Caption" class="block text-sm font-medium text-gray-700 mb-1" />
             <x-text-input id="caption" name="caption" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Enter caption" />
             {{-- Select image type --}}
-            <select name="image_type" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            <select name="type" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                 <option value="user_upload">User Upload</option>
                 <option value="admin_upload">Admin Upload</option>
                 <option value="internal">Internal</option>

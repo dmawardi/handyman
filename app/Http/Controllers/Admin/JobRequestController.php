@@ -8,6 +8,7 @@ use App\Models\JobUpdate;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class JobRequestController extends Controller
@@ -131,8 +132,8 @@ class JobRequestController extends Controller
             'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
             'notes' => 'nullable|string',
             // attachments
-            'images' => 'nullable|array',
-            'images.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5048', // 2MB max size
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5048',
         ])->validate();
 
         // Generate a unique job number
@@ -171,9 +172,9 @@ class JobRequestController extends Controller
         $jobRequest->save();
 
         // Handle attachment uploads
-        if ($request->hasFile('images')) {
+        if ($request->hasFile('attachments')) {
             // Loop through each image, upload it to S3, and save the path
-            $this->handleAttachments($validated['images'], $jobRequest, $user);
+            $this->handleAttachments($validated['attachments'], $jobRequest, $user);
         }
         
         return redirect()->route('admin.job-requests.index')
@@ -188,7 +189,7 @@ class JobRequestController extends Controller
         // Load associated user and worker
         $jobRequest->load(['requestor', 'worker', 'noteUpdates' => function ($query) {
             $query->orderBy('created_at', 'asc');
-        }, 'images'=> function ($query) {
+        }, 'attachments' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
         $workers = User::where('user_type', 'worker')->get();
@@ -204,6 +205,10 @@ class JobRequestController extends Controller
         $users = User::where('user_type', 'customer')->get();
         $workers = User::where('user_type', 'worker')->get();
 
+        $jobRequest->load(['requestor', 'worker', 'attachments' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }]);
+
         return view('admin.job_requests.edit', [
             'jobRequest' => $jobRequest, 
             'apiKey' => env('GOOGLE_API_KEY'),
@@ -217,9 +222,12 @@ class JobRequestController extends Controller
      */
     public function update(Request $request, JobRequest $jobRequest)
     {
+        Log::info('JobRequestController@update', [
+            'jobRequest' => $jobRequest,
+            'request' => $request->all(),
+        ]);
         // Validate the request data
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'worker_id' => 'nullable|exists:users,id',
             'contact_name' => 'required|string|max:255',
             'contact_email' => 'required|email|max:255',
@@ -242,7 +250,13 @@ class JobRequestController extends Controller
             'job_description' => 'required|string',
             'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
             'notes' => 'nullable|string',
+            // attachments
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,webp|max:5048',
+            'delete_attachments' => 'nullable|array',
+            'delete_attachments.*' => 'nullable|exists:job_request_attachments,id',
         ]);
+        Log::info("validated data: ", $validated);
         
         // Update completion date based on status change
         $oldStatus = $jobRequest->status;
@@ -256,8 +270,25 @@ class JobRequestController extends Controller
             $jobRequest->completion_date = null;
         }
         
+        // Strip out the attachments and delete_attachments
+        $validated = $request->except(['attachments', 'delete_attachments']);
+
         // Update the job request
         $jobRequest->update($validated);
+        // Grab logged in user
+        $user = auth()->user();
+
+        // Handle attachment uploads
+        if ($request->hasFile('attachments')) {
+            // Loop through each image, upload it to S3, and save the path
+            $this->handleAttachments($request->attachments, $jobRequest, $user);
+        }
+
+        // Delete the attachment from S3
+        if ($request->has('delete_attachments')) {
+            // Loop through each attachment, and delete from S3
+            $this->handleAtachmentDeletions($request->delete_attachments);
+        }
         
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Job request updated successfully.');
@@ -367,30 +398,46 @@ class JobRequestController extends Controller
     // and handles the image attachments
     private function handleAttachments($requestAttachments, $jobRequest, $user)
     {
-        // Check if the request has images
+        // Check if the request has attachments
         if ($requestAttachments) {
             // Loop through each image, upload it to S3, and save the path
             foreach ($requestAttachments as $image) {
                 // Handle S3 upload logic here
                 $path = $this->handleS3Upload($image, $jobRequest->id);
                 
-                // Create a new JobRequestImage instance
-                $jobRequestImage = new \App\Models\JobRequestImage();
+                // Create a new JobRequestAttachment instance
+                $jobRequestAttachment = new \App\Models\JobRequestAttachment();
         
-                $jobRequestImage->fill([
+                $jobRequestAttachment->fill([
                     'job_request_id' => $jobRequest->id,
                     'user_id' => $user->id,
                     'path' => $path,
                     'original_filename' => $image->getClientOriginalName(),
                     'file_type' => $image->getClientMimeType(),
                     'file_size' => $image->getSize(),
-                    'image_type' => 'user_upload',
+                    'type' => 'admin_upload',
                     'is_visible_to_customer' => true,
                     'is_active' => true,
                 ]);
                 
-                $jobRequestImage->save();
+                $jobRequestAttachment->save();
             }
+        }
+    }
+    // Takes a list of IDs and an image ID
+    private function handleAtachmentDeletions($listOfIds)
+    {
+        foreach($listOfIds as $id) {
+            // Find the attachment by ID
+            $attachment = \App\Models\JobRequestAttachment::findOrFail($id);
+            
+            // Delete the attachment from S3
+            if ($attachment->path) {
+                Storage::disk('s3')->delete($attachment->path);
+            }
+            
+            // Delete the attachment record from the database
+            $attachment->delete();
         }
     }
 }

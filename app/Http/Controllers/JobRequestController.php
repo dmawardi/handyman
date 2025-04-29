@@ -44,7 +44,8 @@ class JobRequestController extends Controller
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'required|string',
-            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate images
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate images
         ]);
 
         // Find the user by email
@@ -64,8 +65,8 @@ class JobRequestController extends Controller
         // Generate a unique job number
         $jobNumber = self::generateOrderNumber();
         
-        // Remove images from validated data for job request creation
-        $dataForJobRequest = collect($validated)->except(['images'])->toArray();
+        // Remove attachments from validated data for job request creation
+        $dataForJobRequest = collect($validated)->except(['attachments'])->toArray();
 
         // Create the job request with the validated data
         $jobRequest = new \App\Models\JobRequest();
@@ -75,10 +76,10 @@ class JobRequestController extends Controller
         $jobRequest->status = 'Pending';
         $jobRequest->save();
 
-        // Handle image uploads
-        if ($request->hasFile('images')) {
-            // Loop through each image, upload it to S3, and save the path
-            $this->handleImageAttachments($validated['images'], $jobRequest, $user);
+        // Handle attachment uploads
+        if ($request->hasFile('attachments')) {
+            // Loop through each attachment, upload it to S3, and save the path
+            $this->handleImageAttachments($validated['attachments'], $jobRequest, $user);
         }
         
         // Send a confirmation email to the user
@@ -95,7 +96,7 @@ class JobRequestController extends Controller
         // Fetch the user and check user type
         $loggedInUser = auth()->user();
         // Logic to show a specific job request
-        $jobRequest = \App\Models\JobRequest::findOrFail($id)->load('images');
+        $jobRequest = \App\Models\JobRequest::findOrFail($id)->load('attachments');
         // Check if the job request belongs to the logged-in user
         if ($jobRequest->user_id !== $loggedInUser->id) {
             // If the job request does not belong to the logged-in user
@@ -163,27 +164,27 @@ class JobRequestController extends Controller
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'required|string',
-            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate images
-            'delete_images' => 'nullable|array',
-            'delete_images.*' => 'exists:job_request_images,id', // Validate image IDs for deletion
+            'attachments.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate attachments
+            'delete_attachments' => 'nullable|array',
+            'delete_attachments.*' => 'exists:job_request_attachments,id', // Validate image IDs for deletion
         ]);
         // Note: We don't allow changing the email as it's tied to user identity
 
-        // Remove images from validated data for job request creation
-        $dataForJobRequest = collect($validated)->except(['images', 'delete_images'])->toArray();
+        // Remove attachments from validated data for job request creation
+        $dataForJobRequest = collect($validated)->except(['attachments', 'delete_attachments'])->toArray();
 
         // Update the job request with validated data
         $jobRequest->update($dataForJobRequest);
 
-        // Handle image uploads
-        if ($request->hasFile('images')) {
+        // Handle attachment uploads
+        if ($request->hasFile('attachments')) {
             // Loop through each image, upload it to S3, and save the path
-            $this->handleImageAttachments($validated['images'], $jobRequest, $loggedInUser);
+            $this->handleImageAttachments($validated['attachments'], $jobRequest, $loggedInUser);
         }
 
-        // Handle image deletions
-        if ($request->has('delete_images')) {
-            $this->handleImageAtachmentDeletions($validated['delete_images']);
+        // Handle attachment deletions
+        if ($request->has('delete_attachments')) {
+            $this->handleImageAtachmentDeletions($validated['delete_attachments']);
         }
         
         
@@ -251,22 +252,22 @@ class JobRequestController extends Controller
             // Handle S3 upload logic here
             $path = $this->handleS3Upload($image, $jobRequest->id);
             
-            // Create a new JobRequestImage instance
-            $jobRequestImage = new \App\Models\JobRequestImage();
+            // Create a new JobRequestAttachment instance
+            $jobRequestAttachment = new \App\Models\JobRequestAttachment();
     
-            $jobRequestImage->fill([
+            $jobRequestAttachment->fill([
                 'job_request_id' => $jobRequest->id,
                 'user_id' => $user->id,
                 'path' => $path,
                 'original_filename' => $image->getClientOriginalName(),
                 'file_type' => $image->getClientMimeType(),
                 'file_size' => $image->getSize(),
-                'image_type' => 'user_upload',
+                'type' => 'user_upload',
                 'is_visible_to_customer' => true,
                 'is_active' => true,
             ]);
             
-            $jobRequestImage->save();
+            $jobRequestAttachment->save();
         }
     }
     // Takes a list of IDs and an image ID
@@ -274,7 +275,7 @@ class JobRequestController extends Controller
     {
         foreach($listOfIds as $id) {
             // Find the image by ID
-            $image = \App\Models\JobRequestImage::findOrFail($id);
+            $image = \App\Models\JobRequestAttachment::findOrFail($id);
             
             // Delete the image from S3
             if ($image->path) {

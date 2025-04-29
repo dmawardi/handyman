@@ -5,14 +5,14 @@
     <h3 class="text-lg font-medium text-gray-900 mb-4">Image Attachments</h3>
     <div class="space-y-4">
         <!-- Existing Images -->
-        @if(isset($jobRequest) && $jobRequest->images && count($jobRequest->images) > 0)
+        @if(isset($jobRequest) && $jobRequest->attachments && count($jobRequest->attachments) > 0)
             <div>
                 <h4 class="text-sm font-medium text-gray-700 mb-2">Current Attachments</h4>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    @foreach($jobRequest->images as $image)
+                    @foreach($jobRequest->attachments as $image)
                         <div class="relative group">
-                            <img src="{{ $image->getSrc() }}" alt="Attachment" data-id={{ $image->id }} class="existing-images w-full h-32 object-cover rounded-md shadow">
-                                <button type="button" class="existing-images absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded shadow group-hover:opacity-100 opacity-0 transition-opacity duration-200" onclick="removeImage('{{ $image->id }}')">
+                            <img src="{{ $image->getSrc() }}" alt="Attachment" data-id={{ $image->id }} class="existing_attachments w-full h-32 object-cover rounded-md shadow">
+                                <button type="button" class="existing_attachments absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded shadow group-hover:opacity-100 opacity-0 transition-opacity duration-200" onclick="removeAttachment('{{ $image->id }}')">
                                     Remove
                                 </button>
                         </div>
@@ -21,19 +21,19 @@
             </div>
         @endif
 
-        <!-- Add New Images -->
+        <!-- Add New Attachments -->
         <div>
-            <x-input-label for="images" :value="__('Add Images')" />
-            <input id="images" name="images[]" type="file" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" multiple accept="image/*">
-            @if($errors->has('images'))
-                <x-input-error :messages="$errors->get('images')" class="mt-2" />
+            <x-input-label for="attachments" :value="__('Add Attachments')" />
+            <input id="attachments" name="attachments[]" type="file" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" multiple accept="attachments/*">
+            @if($errors->has('attachments'))
+                <x-input-error :messages="$errors->get('attachments')" class="mt-2" />
             @endif
-            @foreach($errors->get('images.*') as $key => $error)
+            @foreach($errors->get('attachments.*') as $key => $error)
                 <x-input-error :messages="$error" class="mt-2" />
             @endforeach
-            <p class="mt-1 text-xs text-gray-500">You can upload multiple images. Accepted formats: JPG, PNG, GIF.</p>
+            <p class="mt-1 text-xs text-gray-500">You can upload multiple attachments. Accepted formats: JPG, PNG, GIF.</p>
             {{-- Delete image hidden input --}}
-            <input type="hidden" name="delete_images[]" id="delete_images" value="">
+            <input type="hidden" name="delete_attachments[]" id="delete_attachments" value="">
         </div>
 
         <!-- Preview New Images -->
@@ -45,17 +45,17 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const imageInput = document.getElementById('images');
+        const attachmentsInput = document.getElementById('attachments');
         const previewContainer = document.getElementById('image-preview-container');
 
         // Handle image input change
-        imageInput.addEventListener('change', function () {
+        attachmentsInput.addEventListener('change', function () {
             // Clear previous previews
             previewContainer.innerHTML = '';
             previewContainer.classList.add('hidden');
 
             // Assign the selected files to a variable
-            const files = imageInput.files;
+            const files = attachmentsInput.files;
             // Check if there are files
             if (files.length > 0) {
                 previewContainer.classList.remove('hidden');
@@ -84,54 +84,54 @@
         });
     });
 
-    // This function should be called when the page loads to mark existing images for removal
-    function markExistingImagesBasedOnDeleteImages() {
-        // Grab the existing images
-        const existingImages = document.querySelectorAll('img[class~="existing-images"]');
-        // Get the delete_images input value
-        const deleteImagesInput = document.querySelector('input[name="delete_images[]"]');
-        const deleteImagesArray = deleteImagesInput.value.split(',').map(id => id.trim());
+    // This function should be called when the page loads to mark existing attachments for removal
+    function markExistingAttachmentsBasedOnDeleteAttachments() {
+        // Grab the existing attachments
+        const existingAttachments = document.querySelectorAll('img[class~="existing_attachments"]');
+        // Get the delete_attachments input value
+        const deleteAttachmentsInput = document.querySelector('input[name="delete_attachments[]"]');
+        const deleteAttachmentsArray = deleteAttachmentsInput.value.split(',').map(id => id.trim());
 
 
-        // Loop through existing images and mark them if the id is in the delete_images array
-        existingImages.forEach(image => {
+        // Loop through existing attachments and mark them if the id is in the delete_attachments array
+        existingAttachments.forEach(attachment => {
             // Get the image ID from the data-id attribute
-            const imageId = image.getAttribute('data-id');
+            const id = attachment.getAttribute('data-id');
 
-            // Based on if the image ID is in the delete_images array, change the appearance
-            changeAppearanceOfImagePreview(image, image.nextElementSibling, deleteImagesArray.includes(imageId));
+            // Based on if the image ID is in the delete_attachments array, change the appearance
+            changeAppearanceOfImagePreview(attachment, attachment.nextElementSibling, deleteAttachmentsArray.includes(id));
         });
     }
-    // Function to handle image removal by adding it to the delete_images array
-    function removeImage(imageId) {
+    // Function to handle attachment removal by adding it to the delete_attachments array
+    function removeAttachment(imageId) {
         // Confirm the removal action with prompt
-        if (confirm('Are you sure you want to remove this image?')) {
-            // Grab the delete_images input
-            const deleteImagesInput = document.querySelector('input[name="delete_images[]"]');
-            // Get the current value of delete_images
-            let currentDeleteImages = deleteImagesInput.value ? deleteImagesInput.value.split(',') : [];
-            // Add the image ID to the delete_images array
-            if (!currentDeleteImages.includes(imageId)) {
-                currentDeleteImages.push(imageId);
+        if (confirm('Are you sure you want to remove this attachment?')) {
+            // Grab the delete_attachments input
+            const deleteAttachmentsInput = document.querySelector('input[name="delete_attachments[]"]');
+            // Get the current value of delete_attachments
+            let currentDeleteAttachments = deleteAttachmentsInput.value ? deleteAttachmentsInput.value.split(',') : [];
+            // Add the ID to the delete_attachments array
+            if (!currentDeleteAttachments.includes(imageId)) {
+                currentDeleteAttachments.push(imageId);
             }
-            // Update the delete_images input value
-            deleteImagesInput.value = currentDeleteImages.join(',');
+            // Update the delete_attachments input value
+            deleteAttachmentsInput.value = currentDeleteAttachments.join(',');
 
-            markExistingImagesBasedOnDeleteImages(); // Call the function to update the UI
+            markExistingAttachmentsBasedOnDeleteAttachments(); // Call the function to update the UI
         }
     }
-    // Function to handle image restoration by removing it from the delete_images array
-    function restoreImage(imageId) {
-        // Grab the delete_images input
-        const deleteImagesInput = document.querySelector('input[name="delete_images[]"]');
-        // Get the current value of delete_images
-        let currentDeleteImages = deleteImagesInput.value ? deleteImagesInput.value.split(',') : [];
-        // Remove the image ID from the delete_images array
-        currentDeleteImages = currentDeleteImages.filter(id => id !== imageId);
-        // Update the delete_images input value
-        deleteImagesInput.value = currentDeleteImages.join(',');
+    // Function to handle attachments restoration by removing it from the delete_attachments array
+    function restoreAttachment(imageId) {
+        // Grab the delete_attachments input
+        const deleteAttachmentsInput = document.querySelector('input[name="delete_attachments[]"]');
+        // Get the current value of delete_attachments
+        let currentDeleteAttachments = deleteAttachmentsInput.value ? deleteAttachmentsInput.value.split(',') : [];
+        // Remove the ID from the delete_attachments array
+        currentDeleteAttachments = currentDeleteAttachments.filter(id => id !== imageId);
+        // Update the delete_attachments input value
+        deleteAttachmentsInput.value = currentDeleteAttachments.join(',');
 
-        markExistingImagesBasedOnDeleteImages(); // Call the function to update the UI
+        markExistingAttachmentsBasedOnDeleteAttachments(); // Call the function to update the UI
     }
     // Toggle the opacity of an image element
     function changeAppearanceOfImagePreview(imageElement, buttonElement, markAsDelete) {
@@ -146,7 +146,7 @@
             buttonElement.onclick = null;
             // Add event listener to restore the image
             buttonElement.onclick = function () {
-                restoreImage(imageElement.getAttribute('data-id'));
+                restoreAttachment(imageElement.getAttribute('data-id'));
             };
 
         // If the image is not marked for delete, reset classes and styles
@@ -161,7 +161,7 @@
             buttonElement.onclick = null;
             // Add event listener to restore the image
             buttonElement.onclick = function () {
-                removeImage(imageElement.getAttribute('data-id'));
+                removeAttachment(imageElement.getAttribute('data-id'));
             };
         }
     }

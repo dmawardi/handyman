@@ -153,9 +153,9 @@
                         <!-- Image Attachments -->
                         <div class="md:col-span-2">
                             <h4 class="text-lg font-medium text-gray-900 mb-4">Image Attachments</h4>
-                            @if($jobRequest->images && count($jobRequest->images) > 0)
+                            @if($jobRequest->attachments && count($jobRequest->attachments) > 0)
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    @foreach($jobRequest->images as $image)
+                                    @foreach($jobRequest->attachments as $image)
                                         <div class="relative group">
                                             <img src="{{ $image->getSrc() }}" alt="Attachment" class="w-full h-32 object-cover rounded-md shadow">
                                             @if(auth()->user()->user_type === 'admin')
