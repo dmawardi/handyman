@@ -62,16 +62,12 @@ class JobRequestController extends Controller
             $user->save();
         }
         
-        // Generate a unique job number
-        $jobNumber = self::generateOrderNumber();
-        
         // Remove attachments from validated data for job request creation
         $dataForJobRequest = collect($validated)->except(['attachments'])->toArray();
 
         // Create the job request with the validated data
         $jobRequest = new \App\Models\JobRequest();
         $jobRequest->fill($dataForJobRequest);
-        $jobRequest->job_number = $jobNumber;
         $jobRequest->user_id = $user->id; // Either the found user or the newly created user
         $jobRequest->status = 'Pending';
         $jobRequest->save();
@@ -222,20 +218,6 @@ class JobRequestController extends Controller
     
     
     // Helper Methods
-    /**
-     * Generate a unique job request number.
-     *
-     * @return string
-     */
-    // This method generates a unique job request number using the current timestamp and a random number
-    private static function generateOrderNumber()
-    {
-        // Use the current timestamp and a random number to ensure uniqueness
-        $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
-        $randomNumber = mt_rand(1000, 9999); // Generate a random 4-digit number
-        
-        return 'JOB-' . $timestamp . '-' . $randomNumber; // Example: ORD-20250407123045-1234
-    }
     // This method handles the S3 upload of an image
     private function handleS3Upload($file, $jobRequestId)
     {

@@ -135,9 +135,6 @@ class JobRequestController extends Controller
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5048',
         ])->validate();
-
-        // Generate a unique job number
-        $jobNumber = $this->generateJobNumber();
         
         // Create the job request
         $jobRequest = new JobRequest();
@@ -162,7 +159,6 @@ class JobRequestController extends Controller
         $jobRequest->job_description = $validated['job_description'];
         $jobRequest->status = $validated['status'];
         $jobRequest->notes = $validated['notes'] ?? null;
-        $jobRequest->job_number = $jobNumber;
         
         // Set completion date if status is Completed
         if ($validated['status'] === 'Completed') {
@@ -178,7 +174,7 @@ class JobRequestController extends Controller
         }
         
         return redirect()->route('admin.job-requests.index')
-            ->with('success', 'Job request created successfully. Job number: ' . $jobNumber);
+            ->with('success', 'Job request created successfully. Job number: ' . $jobRequest->job_number);
     }
 
     /**
@@ -381,16 +377,7 @@ class JobRequestController extends Controller
             ->with('success', 'Notes added successfully.');
     }
     
-    /**
-     * Generate a unique job request number.
-     */
-    private function generateJobNumber()
-    {
-        $timestamp = now()->format('YmdHis');
-        $randomNumber = mt_rand(1000, 9999);
-        
-        return 'JOB-' . $timestamp . '-' . $randomNumber;
-    }
+    // Helper methods
     // This method handles the S3 upload of an image
     private function handleS3Upload($file, $jobRequestId)
     {
