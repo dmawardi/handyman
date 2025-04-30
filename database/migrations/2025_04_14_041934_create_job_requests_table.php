@@ -39,6 +39,15 @@ return new class extends Migration
             $table->string('urgency_level');
             $table->integer('job_budget')->nullable();
             $table->text('job_description');
+            // Financial information
+            $table->string('payment_method')->nullable(); // Credit Card, PayPal, etc.
+            $table->string('payment_status')->default('Pending'); // Pending, Completed, Failed
+            $table->string('transaction_id')->nullable(); // Unique transaction ID for payment
+            $table->string('invoice_number')->nullable(); // Invoice number for the job
+            $table->integer('payment_amount')->nullable(); // Amount paid so far
+            $table->string('payment_date')->nullable(); // Date of payment
+            $table->string('payment_receipt')->nullable(); // Receipt for the payment
+            $table->integer('full_amount')->nullable(); // Total amount for the job
             // Internal Use
             $table->dateTime('completion_date')->nullable(); // Date when the job was completed
             $table->string('status')->default('Pending'); // Pending, In Progress, Completed, Cancelled

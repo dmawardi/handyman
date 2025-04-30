@@ -222,10 +222,6 @@ class JobRequestController extends Controller
      */
     public function update(Request $request, JobRequest $jobRequest)
     {
-        Log::info('JobRequestController@update', [
-            'jobRequest' => $jobRequest,
-            'request' => $request->all(),
-        ]);
         // Validate the request data
         $validated = $request->validate([
             'worker_id' => 'nullable|exists:users,id',
@@ -255,8 +251,16 @@ class JobRequestController extends Controller
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,webp|max:5048',
             'delete_attachments' => 'nullable|array',
             'delete_attachments.*' => 'nullable|exists:job_request_attachments,id',
+            // Financial information
+            'payment_method' => 'nullable|string|max:255',
+            'payment_status' => 'nullable|string|in:Pending,Completed,Failed',
+            'transaction_id' => 'nullable|string|max:255',
+            'invoice_number' => 'nullable|string|max:255',
+            'payment_amount' => 'nullable|numeric|min:0',
+            'payment_date' => 'nullable|date',
+            'payment_receipt' => 'nullable|string|max:255',
+            'full_amount' => 'nullable|numeric|min:0',
         ]);
-        Log::info("validated data: ", $validated);
         
         // Update completion date based on status change
         $oldStatus = $jobRequest->status;

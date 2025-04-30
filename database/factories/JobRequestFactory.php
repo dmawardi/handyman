@@ -17,6 +17,8 @@ class JobRequestFactory extends Factory
      */
     public function definition(): array
     {
+        // Generate an amount to be used for payment and full amount
+        $fullPayment = $this->faker->numberBetween(100, 10000);
         return [
             // Relationships
             'user_id' => User::factory(),
@@ -48,6 +50,24 @@ class JobRequestFactory extends Factory
             ]),
             'job_budget' => $this->faker->numberBetween(100, 10000),
             'job_description' => $this->faker->paragraph(),
+            // Financial information
+            'payment_method' => $this->faker->randomElement([
+                'Credit Card',
+                'PayPal',
+                'Bank Transfer',
+                'Cash'
+            ]),
+            'payment_status' => $this->faker->randomElement([
+                'Pending',
+                'Completed',
+                'Failed'
+            ]),
+            'transaction_id' => $this->faker->uuid(),
+            'invoice_amount' => $this->faker->unique()->numberBetween(1000, 9999),
+            'payment_amount' => $fullPayment,
+            'payment_date' => $this->faker->dateTime(),
+            'payment_receipt' => $this->faker->uuid(),
+            'full_amount' => $fullPayment,
         ];
     }
     /**

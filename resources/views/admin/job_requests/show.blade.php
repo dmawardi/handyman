@@ -259,7 +259,11 @@
                             </div>
                         </div>
 
-                        <x-admin.partials._job_request_attachments :jobRequest="$jobRequest" />
+                        {{-- Financial Information --}}
+                        <x-forms.admin.partials._financial_details :jobRequest="$jobRequest" />
+
+                        {{-- Attachments --}}
+                        <x-forms.admin.partials._job_request_attachments :jobRequest="$jobRequest" />
 
                         {{-- Print the note updates --}}
                         <div class="md:col-span-2">
