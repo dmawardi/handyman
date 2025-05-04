@@ -64,4 +64,141 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# handyman
+
+# Handyman
+
+## Getting Started
+
+Follow these instructions to set up and run the Handyman application on your local development environment.
+
+---
+
+### Prerequisites
+
+Make sure you have the following installed on your system:
+- **PHP** (>= 8.2)
+- **Composer** (latest version)
+- **Node.js** (>= 16.x) and **npm** (latest version)
+- **PostGreSQL** or another supported database
+- **Laravel CLI**
+
+---
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-repo/handyman.git
+cd handyman
+```
+
+2. Install PHP dependencies
+```bash
+composer install
+```
+
+3. Install JavaScript dependencies
+```bash
+npm install
+```
+
+4. Copy the .env file and configure your environment variables
+    Focus on the sections of:
+    -Database
+    -Mailer
+```bash
+cp .env.example .env
+```
+
+### Database Setup
+
+**Migrate the Database Without Seeding:** 
+
+To migrate the database without adding seed data:
+```bash
+php artisan migrate:fresh
+```
+
+**Migrate the Database With Seeding:**
+
+To migrate the database and populate it with seed data:
+```bash
+php artisan migrate:fresh --seed
+```
+
+### Frontend Setup
+
+**Run in Development Mode:**
+
+To compile assets for development and enable hot reloading:
+
+```bash
+npm run dev
+```
+
+To compile and minify assets for production:
+```bash
+npm run build
+```
+
+### Using Supervisor to run workers in the background
+```bash
+sudo apt update
+sudo apt install supervisor # brew install supervisor
+
+# Start service
+sudo systemctl start supervisor # brew services start supervisor
+```
+
+For deployment, create a configuration file in the supervisor directory as below. 
+```bash
+sudo nano /etc/supervisor/conf.d/laravel-worker.conf
+```
+
+Place the below code inside. Replace the path in Command with your working directory and user with your username.
+```bash
+[program:laravel-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/your-app/artisan queue:work --sleep=3 --tries=3 --timeout=90
+autostart=true
+autorestart=true
+user=your-username
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/laravel-worker.log # for MacOS: /Users/your-username/supervisor-logs/laravel-worker.log
+```
+Create the default config file by navigating to the folder: /opt/homebrew/opt/supervisor/
+
+Then use the below command to generate the default config file.
+```bash
+echo_supervisord_conf > supervisord.conf
+```
+After creating the config file, add to the file with the below line.
+
+```bash
+files = /etc/supervisor/conf.d/*.conf
+```
+
+The default config file should be placed in the folder: /opt/homebrew/opt/supervisor/
+It searches in this folder automatically.
+
+
+### Reload Supervisor to apply changes
+```bash
+sudo supervisorctl reread # For MacOS supervisor
+sudo supervisorctl update
+sudo supervisorctl start laravel-worker:*
+```
+
+### To check the worker status
+```bash
+sudo supervisorctl status
+```
+
+### To kill the worker process
+```bash
+sudo supervisorctl stop laravel-worker:*
+
+# To shutdown supervisord (the server that is controlled by supervisorctl)
+sudo supervisorctl shutdown
+```
