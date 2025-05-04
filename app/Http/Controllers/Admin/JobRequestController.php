@@ -8,6 +8,7 @@ use App\Models\JobUpdate;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -261,13 +262,19 @@ class JobRequestController extends Controller
         // Update completion date based on status change
         $oldStatus = $jobRequest->status;
         $newStatus = $validated['status'];
-        
+
         if ($oldStatus !== 'Completed' && $newStatus === 'Completed') {
             // Job was just marked complete
             $jobRequest->completion_date = now();
+
+            // Send an email to the requestor
+            Mail::to($jobRequest->requestor->email)->queue(new \App\Mail\JobRequestStatusUpdate($jobRequest));
         } elseif ($oldStatus === 'Completed' && $newStatus !== 'Completed') {
             // Job was un-completed
             $jobRequest->completion_date = null;
+            
+            // Send an email to the requestor
+            Mail::to($jobRequest->requestor->email)->queue(new \App\Mail\JobRequestStatusUpdate($jobRequest));
         }
         
         // Strip out the attachments and delete_attachments
@@ -350,6 +357,9 @@ class JobRequestController extends Controller
         } elseif ($oldStatus === 'Completed' && $newStatus !== 'Completed') {
             $jobRequest->completion_date = null;
         }
+
+        // Send an email to the requestor with news of the update
+        Mail::to($jobRequest->requestor->email)->queue(new \App\Mail\JobRequestStatusUpdate($jobRequest));
         
         $jobRequest->save();
         
