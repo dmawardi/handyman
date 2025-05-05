@@ -11,6 +11,20 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                primary: {
+                    DEFAULT: '#3F3A36',      // Adjusted dark charcoal
+                  },
+                  secondary: {
+                    DEFAULT: '#C67C2D',      // Slightly softened warm brown
+                  },
+                  accent: {
+                    DEFAULT: '#A0A4AA',      // Cool muted grey-blue
+                  },
+                  background: {
+                    DEFAULT: '#F6F3EB',      // Clean light beige
+                  },
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },

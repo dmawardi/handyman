@@ -44,15 +44,9 @@
         'description' => 'Installation, maintenance, and repair of air conditioning systems.',
         'image' => '/images/services/air-conditioning.png',
     ],
-    [
-        'title' => 'Tiling',
-        'description' => 'Professional tiling services for floors and walls.',
-        'image' => '/images/services/tiling.png',
-    ],
 ]])
 
-{{-- Services Section --}}
-<section class="py-16 bg-white">
+<section class="py-16 bg-background">
     <div class="container mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             @for ($index = 0; $index < count($services); $index++)
@@ -60,12 +54,12 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 @endif
-                <div class="bg-gray-50 p-6 rounded-xl shadow hover:shadow-lg transition">
+                <div class="bg-secondary p-6 rounded-xl shadow hover:shadow-lg transition mb-6"> <!-- Added margin-bottom -->
                     <div class="mb-4">
                         <img src="{{ $services[$index]['image'] }}" alt="{{ $services[$index]['title'] }}" class="h-16 mx-auto">
                     </div>
-                    <h3 class="text-xl font-semibold text-center text-gray-800 mb-2">{{ $services[$index]['title'] }}</h3>
-                    <p class="text-gray-600 text-center">{{ $services[$index]['description'] }}</p>
+                    <h3 class="text-xl font-semibold text-center text-primary mb-2">{{ $services[$index]['title'] }}</h3>
+                    <p class="text-background text-center">{{ $services[$index]['description'] }}</p>
                 </div>
             @endfor
         </div>
