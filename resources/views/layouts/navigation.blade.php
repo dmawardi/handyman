@@ -7,26 +7,27 @@
                 <!-- Logo -->
                 <x-application-logo class="h-full sm:ml-0 mx-auto" />
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-4 sm:-my-px sm:ms-10 sm:flex">
-                    {{-- AUTH --}}
-                    @auth
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:text-secondary">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                    @endauth
+            </div>
+            
+            {{-- Right portion of nav bar --}}
+            <!-- Navigation Links -->
+            <div class="hidden space-x-4 sm:-my-px sm:ms-10 sm:flex">
+                {{-- AUTH --}}
+                @auth
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:text-secondary">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>
+                @endauth
 
-                    {{-- PUBLIC --}}
-                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')" class="text-white hover:text-secondary">
-                        {{ __('Home') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('services')" :active="request()->routeIs('services')" class="text-white hover:text-secondary">
-                        {{ __('Services') }}
-                    </x-nav-link>
-                </div>
+                {{-- PUBLIC --}}
+                <x-nav-link :href="route('home')" :active="request()->routeIs('home')" class="text-white hover:text-secondary">
+                    {{ __('Home') }}
+                </x-nav-link>
+                <x-nav-link :href="route('services')" :active="request()->routeIs('services')" class="text-white hover:text-secondary">
+                    {{ __('Services') }}
+                </x-nav-link>
             </div>
 
-            {{-- Right portion of nav bar --}}
             <!-- Settings Dropdown (hidden if not logged in) -->
             @auth
                 <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -62,9 +63,10 @@
                     </x-dropdown>
                 </div>
             @endauth
+            {{-- Login button (hidden if logged in) --}}
             @guest
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <a href="{{ route('login') }}" class="hidden sm:flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary bg-background hover:text-accent focus:outline-none transition ease-in-out duration-150">
+                    <a href="{{ route('login') }}" class="hidden sm:flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium text-primary bg-background hover:text-accent focus:outline-none transition ease-in-out duration-150">
                         {{ __('Login') }}
                     </a>
                 </div>
