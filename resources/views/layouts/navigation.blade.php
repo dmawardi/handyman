@@ -5,10 +5,10 @@
             {{-- Logo and links div --}}
             <div class="flex">
                 <!-- Logo -->
-                <x-application-logo class="h-full sm:ms-0 mx-auto" />
+                <x-application-logo class="h-full sm:ml-0 mx-auto" />
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-4 sm:-my-px sm:ms-10 sm:flex">
                     {{-- AUTH --}}
                     @auth
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:text-secondary">
@@ -19,9 +19,6 @@
                     {{-- PUBLIC --}}
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')" class="text-white hover:text-secondary">
                         {{ __('Home') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('about')" :active="request()->routeIs('about')" class="text-white hover:text-secondary">
-                        {{ __('About Us') }}
                     </x-nav-link>
                     <x-nav-link :href="route('services')" :active="request()->routeIs('services')" class="text-white hover:text-secondary">
                         {{ __('Services') }}
