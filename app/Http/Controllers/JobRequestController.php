@@ -125,6 +125,12 @@ class JobRequestController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Preprocess the request to remove empty values from delete_attachments
+        // This is to ensure that we only send non-empty values to the database
+        $request->merge([
+            'delete_attachments' => array_filter($request->input('delete_attachments', [])),
+        ]);
+        
         // Fetch the user and the job request
         $loggedInUser = auth()->user();
         $jobRequest = \App\Models\JobRequest::findOrFail($id);
