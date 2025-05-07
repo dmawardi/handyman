@@ -92,8 +92,12 @@ class JobRequestController extends Controller
     {
         // Fetch the user and check user type
         $loggedInUser = auth()->user();
-        // Logic to show a specific job request
-        $jobRequest = \App\Models\JobRequest::findOrFail($id)->load('attachments');
+        
+        // Check cache for Job Req. if not found fetch with attachments 
+        // set as cache key for 10 minutes
+        $jobRequest = cache()->remember('job_request_' . $id, now()->addMinutes(10), function () use ($id) {
+            return \App\Models\JobRequest::with(['attachments'])->findOrFail($id);
+        });
         // Check if the job request belongs to the logged-in user
         if ($jobRequest->user_id !== $loggedInUser->id) {
             // If the job request does not belong to the logged-in user
@@ -106,7 +110,11 @@ class JobRequestController extends Controller
     public function edit($id)
     {
         $loggedInUser = auth()->user();
-        $jobRequest = \App\Models\JobRequest::findOrFail($id);
+        // Check cache for Job Req. if not found fetch with attachments 
+        // set as cache key for 10 minutes
+        $jobRequest = cache()->remember('job_request_' . $id, now()->addMinutes(10), function () use ($id) {
+            return \App\Models\JobRequest::with(['attachments'])->findOrFail($id);
+        });
         
         // Check if the job request belongs to the logged-in user
         if ($jobRequest->user_id !== $loggedInUser->id) {
@@ -130,7 +138,7 @@ class JobRequestController extends Controller
         $request->merge([
             'delete_attachments' => array_filter($request->input('delete_attachments', [])),
         ]);
-        
+
         // Fetch the user and the job request
         $loggedInUser = auth()->user();
         $jobRequest = \App\Models\JobRequest::findOrFail($id);
@@ -190,6 +198,15 @@ class JobRequestController extends Controller
             $this->handleImageAtachmentDeletions($validated['delete_attachments']);
         }
         
+        // Generate a cache key based on the job request ID
+        $cacheKey = 'job_request_' . $jobRequest->id;
+        // CLear cache
+        cache()->forget($cacheKey);
+
+        // Re-fetch the job request with attachments and set as cache key for 10 minutes
+        cache()->remember($cacheKey, now()->addMinutes(10), function () use ($jobRequest) {
+            return \App\Models\JobRequest::with(['requestor', 'worker', 'attachments'])->findOrFail($jobRequest->id);
+        });
         
         return redirect()->route('job-requests.show', $jobRequest->id)
             ->with('success', 'Job request updated successfully!');
@@ -200,6 +217,8 @@ class JobRequestController extends Controller
         // Fetch the user and job request
         $loggedInUser = auth()->user();
         $jobRequest = \App\Models\JobRequest::findOrFail($id);
+
+        
         
         // Check if the job request belongs to the logged-in user
         if ($jobRequest->user_id !== $loggedInUser->id) {
@@ -216,13 +235,14 @@ class JobRequestController extends Controller
         // Change status to cancelled (soft delete)
         $jobRequest->status = 'Cancelled';
         $jobRequest->save();
+
+        // Clear cache
+        $cacheKey = 'job_request_' . $jobRequest->id;
+        cache()->forget($cacheKey);
                 
         return redirect()->route('job-requests.index')
             ->with('success', 'Job request cancelled successfully.');
     }
-
-    
-    
     
     // Helper Methods
     // This method handles the S3 upload of an image
