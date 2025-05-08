@@ -183,6 +183,13 @@ class JobRequestController extends Controller
      */
     public function show(JobRequest $jobRequest)
     {
+        $jobRequest = cache()->remember('admin_job_request_' . $jobRequest->id, 60, function () use ($jobRequest) {
+            return JobRequest::with(['requestor', 'worker', 'noteUpdates' => function ($query) {
+                $query->orderBy('created_at', 'asc');
+            }, 'attachments' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            }])->find($jobRequest->id);
+        });
         // Load associated user and worker
         $jobRequest->load(['requestor', 'worker', 'noteUpdates' => function ($query) {
             $query->orderBy('created_at', 'asc');
@@ -202,9 +209,11 @@ class JobRequestController extends Controller
         $users = User::where('user_type', 'customer')->get();
         $workers = User::where('user_type', 'worker')->get();
 
-        $jobRequest->load(['requestor', 'worker', 'attachments' => function ($query) {
-            $query->orderBy('created_at', 'desc');
-        }]);
+        $jobRequest = cache()->remember('admin_job_request_' . $jobRequest->id, 60, function () use ($jobRequest) {
+            return JobRequest::with(['requestor', 'worker', 'attachments' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            }])->find($jobRequest->id);
+        });
 
         return view('admin.job_requests.edit', [
             'jobRequest' => $jobRequest, 
@@ -224,13 +233,15 @@ class JobRequestController extends Controller
         $request->merge([
             'delete_attachments' => array_filter($request->input('delete_attachments', [])),
         ]);
-        
+
+        Log::info('Request: ', $request->all());
+
         // Validate the request data
         $validated = $request->validate([
             'worker_id' => 'nullable|exists:users,id',
-            'contact_name' => 'required|string|max:255',
-            'contact_email' => 'required|email|max:255',
-            'contact_phone' => 'required|string|max:20',
+            'contact_name' => 'nullable|string|max:255',
+            'contact_email' => 'nullable|email|max:255',
+            'contact_phone' => 'nullable|string|max:20',
             // Api search result
             'api_search' => 'nullable|string|max:255',
             // Address information
@@ -243,11 +254,11 @@ class JobRequestController extends Controller
             'location' => 'nullable|string|max:255',
             'latitude' => 'nullable|string|max:255',
             'longitude' => 'nullable|string|max:255',
-            'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
-            'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
+            'job_type' => 'nullable|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
+            'urgency_level' => 'nullable|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
-            'job_description' => 'required|string',
-            'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
+            'job_description' => 'nullable|string',
+            'status' => 'nullable|string|in:Pending,In Progress,Completed,Cancelled',
             'notes' => 'nullable|string',
             // attachments
             'attachments' => 'nullable|array',
@@ -267,7 +278,7 @@ class JobRequestController extends Controller
         
         // Update completion date based on status change
         $oldStatus = $jobRequest->status;
-        $newStatus = $validated['status'];
+        $newStatus = $validated['status'] ?? null;
 
         if ($oldStatus !== 'Completed' && $newStatus === 'Completed') {
             // Job was just marked complete
@@ -284,7 +295,7 @@ class JobRequestController extends Controller
         }
         
         // Strip out the attachments and delete_attachments
-        $validated = $request->except(['attachments', 'delete_attachments']);
+        $validated = $request->except(['attachments', 'delete_attachments', 'job_request_id']);
 
         // Update the job request
         $jobRequest->update($validated);
@@ -302,6 +313,16 @@ class JobRequestController extends Controller
             // Loop through each attachment, and delete from S3
             $this->handleAtachmentDeletions($request->delete_attachments);
         }
+
+        // Generate a cache key based on the job request ID
+        $cacheKey = 'admin_job_request_' . $jobRequest->id;
+        // CLear cache
+        cache()->forget($cacheKey);
+
+        // Re-fetch the job request with attachments and set as cache key for 10 minutes
+        cache()->remember($cacheKey, now()->addMinutes(10), function () use ($jobRequest) {
+            return \App\Models\JobRequest::with(['requestor', 'worker', 'attachments'])->findOrFail($jobRequest->id);
+        });
         
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Job request updated successfully.');
@@ -314,6 +335,10 @@ class JobRequestController extends Controller
     {
         // Permanently delete the job request
         $jobRequest->delete();
+
+        // Clear cache
+        $cacheKey = 'admin_job_request_' . $jobRequest->id;
+        cache()->forget($cacheKey);
         
         return redirect()->route('admin.job-requests.index')
             ->with('success', 'Job request deleted successfully.');
@@ -336,9 +361,11 @@ class JobRequestController extends Controller
         }
         
         $jobRequest->save();
-        
-        $worker = User::find($validated['worker_id']);
-        
+
+        // Clear cache
+        $cacheKey = 'admin_job_request_' . $jobRequest->id;
+        cache()->forget($cacheKey);
+                
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Worker assigned successfully.');
     }
@@ -368,6 +395,10 @@ class JobRequestController extends Controller
         Mail::to($jobRequest->requestor->email)->queue(new \App\Mail\JobRequestStatusUpdate($jobRequest));
         
         $jobRequest->save();
+
+        // Clear cache
+        $cacheKey = 'admin_job_request_' . $jobRequest->id;
+        cache()->forget($cacheKey);
         
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Job request status updated successfully.');
@@ -388,6 +419,10 @@ class JobRequestController extends Controller
         $jobUpdate->update_description = $validated['noteUpdate'];
         $jobUpdate->user_id = auth()->id(); // Assuming the admin is the one adding the note
         $jobUpdate->save();
+
+        // Clear cache
+        $cacheKey = 'admin_job_request_' . $jobRequest->id;
+        cache()->forget($cacheKey);
         
         return redirect()->route('admin.job-requests.show', $jobRequest)
             ->with('success', 'Notes added successfully.');

@@ -60,6 +60,11 @@ class JobRequest extends Model
     }
 
     protected $casts = [
-        'completion_date' => 'datetime', // ✅ Correct
+        'completion_date' => 'datetime', 
+        'created_at' => 'datetime', 
+        'updated_at' => 'datetime', 
+        'deleted_at' => 'datetime', 
+        'payment_amount' => 'integer', 
+        'full_amount' => 'integer', 
     ];
 }

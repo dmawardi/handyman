@@ -7,9 +7,15 @@
     <form method="POST" action="{{ route('admin.job-requests.update', $jobRequest->id) }}">
         @csrf
         @method('PATCH')
-
-        <!-- Hidden Field for Job Request ID -->
-        <input type="hidden" name="job_request_id" value="{{ $jobRequest->id }}">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Payment Method -->
@@ -57,7 +63,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">$</span>
                     </div>
-                    <x-text-input id="payment_amount" name="payment_amount" type="number" min="0" step="0.01" class="block w-full pl-7" :value="old('payment_amount', $jobRequest?->payment_amount)" placeholder="0.00" />
+                    <x-text-input id="payment_amount" name="payment_amount" type="number" min="0" step="1" class="block w-full pl-7" :value="old('payment_amount', $jobRequest?->payment_amount)" placeholder="0" />
                 </div>
                 <x-input-error :messages="$errors->get('payment_amount')" class="mt-2" />
             </div>
@@ -83,7 +89,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">$</span>
                     </div>
-                    <x-text-input id="full_amount" name="full_amount" type="number" min="0" step="0.01" class="block w-full pl-7" :value="old('full_amount', $jobRequest?->full_amount)" placeholder="0.00" />
+                    <x-text-input id="full_amount" name="full_amount" type="number" min="0" step="1" class="block w-full pl-7" :value="old('full_amount', $jobRequest?->full_amount)" placeholder="0" />
                 </div>
                 <x-input-error :messages="$errors->get('full_amount')" class="mt-2" />
             </div>

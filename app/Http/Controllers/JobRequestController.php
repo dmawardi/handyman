@@ -217,8 +217,6 @@ class JobRequestController extends Controller
         // Fetch the user and job request
         $loggedInUser = auth()->user();
         $jobRequest = \App\Models\JobRequest::findOrFail($id);
-
-        
         
         // Check if the job request belongs to the logged-in user
         if ($jobRequest->user_id !== $loggedInUser->id) {
