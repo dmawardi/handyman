@@ -1,5 +1,5 @@
 @props([
-    'phoneNumber' => '628113702797', // Default phone number
+    'phoneNumber' => env('BUSINESS_PHONE'), // Default phone number
     'message' => "Hey RumahFix! I’d like to book a service (details below).\nName:\nEmail:\nAddress:\nUrgency(Emergency/48hrs/1week):\nJob Description:" // Default message
 ])
 

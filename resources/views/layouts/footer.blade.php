@@ -31,7 +31,7 @@
                 <p class="text-sm mb-4">
                     Need assistance? Chat with us on WhatsApp for quick support.
                 </p>
-                <a href="https://wa.me/628113702797?text={{ urlencode('Hello RumahFix! I need assistance with your services.') }}" 
+                <a href="https://wa.me/{{ env('BUSINESS_PHONE') }}?text={{ urlencode('Hello RumahFix! I need assistance with your services.') }}" 
                    target="_blank" 
                    rel="noopener noreferrer"
                    class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md shadow-lg transition-all duration-300">
