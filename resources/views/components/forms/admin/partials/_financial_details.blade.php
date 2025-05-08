@@ -60,9 +60,6 @@
             <div>
                 <x-input-label for="payment_amount" :value="__('Payment Amount')" />
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-500 sm:text-sm">$</span>
-                    </div>
                     <x-text-input id="payment_amount" name="payment_amount" type="number" min="0" step="1" class="block w-full pl-7" :value="old('payment_amount', $jobRequest?->payment_amount)" placeholder="0" />
                 </div>
                 <x-input-error :messages="$errors->get('payment_amount')" class="mt-2" />
@@ -86,9 +83,6 @@
             <div>
                 <x-input-label for="full_amount" :value="__('Full Amount')" />
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-500 sm:text-sm">$</span>
-                    </div>
                     <x-text-input id="full_amount" name="full_amount" type="number" min="0" step="1" class="block w-full pl-7" :value="old('full_amount', $jobRequest?->full_amount)" placeholder="0" />
                 </div>
                 <x-input-error :messages="$errors->get('full_amount')" class="mt-2" />
