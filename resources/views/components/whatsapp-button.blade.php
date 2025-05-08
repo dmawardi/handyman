@@ -1,5 +1,9 @@
-<!-- resources/views/components/whatsapp-button.blade.php -->
-<a href="https://wa.me/{{ $phoneNumber }}" 
+@props([
+    'phoneNumber' => '628113702797', // Default phone number
+    'message' => "Hey RumahFix! I’d like to book a service (details below).\nName:\nEmail:\nAddress:\nUrgency(Emergency/48hrs/1week):\nJob Description:" // Default message
+])
+
+<a href="https://wa.me/{{ $phoneNumber }}?text={{ urlencode($message) }}" 
    target="_blank" 
    rel="noopener noreferrer"
    class="fixed bottom-5 right-5 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg z-50 transition-all duration-300 flex items-center space-x-2">
