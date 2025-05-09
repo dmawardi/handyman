@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             // Job details
-            $table->string('job_type');
+            $table->string('job_type')->index();;
             $table->string('urgency_level');
             $table->integer('job_budget')->nullable();
             $table->text('job_description');
@@ -49,8 +49,8 @@ return new class extends Migration
             $table->string('payment_receipt')->nullable(); // Receipt for the payment
             $table->integer('full_amount')->nullable(); // Total amount for the job
             // Internal Use
-            $table->dateTime('completion_date')->nullable(); // Date when the job was completed
-            $table->string('status')->default('Pending'); // Pending, In Progress, Completed, Cancelled
+            $table->dateTime('completion_date')->nullable()->index(); // Added index
+            $table->string('status')->default('Pending')->index(); // Added index
             $table->string('notes')->nullable(); // Internal notes for the job request
         });
     }
