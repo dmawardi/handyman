@@ -5,7 +5,9 @@
             {{-- Logo and links div --}}
             <div class="flex">
                 <!-- Logo -->
-                <x-application-logo class="h-full sm:ml-0 mx-auto" />
+                <a href="{{ auth()->check() ? route('dashboard') : route('home') }}" class="flex items-center">
+                    <x-application-logo class="h-full sm:ml-0 mx-auto" />
+                </a>
 
             </div>
             
