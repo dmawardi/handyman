@@ -10,7 +10,12 @@
                 </p>
                 <p class="mt-4 text-sm">
                     <strong>Service Areas:</strong> Canggu, Seminyak, Umalas, Kerobokan, Pereranan<br>
-                    <strong>Phone:</strong> +62 811 370 2797<br>
+                    @php
+                        $phone = env('BUSINESS_PHONE');
+                        // Place spaces in the phone number for better readability
+                        $formattedPhone = implode(' ', str_split($phone, 3));
+                    @endphp
+                    <strong>Phone:</strong> +{{ $formattedPhone }}<br>
                     <strong>Email:</strong> support@rumahfix.com
                 </p>
             </div>
