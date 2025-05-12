@@ -1,6 +1,6 @@
-<x-app-layout title="Handyman Bali | Our Services" 
-description="Have a job that needs doing? Submit a request for handyman services in Bali. Our team is ready to assist you with all your maintenance needs, from plumbing to electrical work and more."
-keywords="handyman services, plumbing, electrical work, carpentry, maintenance, Bali" canonical="url('/request')">
+<x-app-layout title="RumahFix Bali | Submit a Job Request" 
+description="Have a job that needs doing? Submit a request for maintenance services in Bali. Our team is ready to assist you with all your maintenance needs, from plumbing to electrical work and more."
+keywords="handyman services, plumbing, electrical work, carpentry, maintenance, Bali" canonical="url('/job-requests/create')">
     <x-slot name="header">
         <h1>
             {{ __('Welcome to the job request page!') }}
