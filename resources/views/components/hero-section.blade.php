@@ -1,13 +1,28 @@
-@props(['title' => 'Ready to Fix Your Home Problems?', 'description' => 'Our professional handyman team is just a click away. Get your free quote today and solve those nagging home repair issues.', 'buttonText' => '', 'buttonAction' => route('job-requests.create')])
+@props([
+    'title' => 'Ready to Fix Your Home Problems?',
+    'description' => 'Our professional handyman team is just a click away. Get your free quote today and solve those nagging home repair issues.',
+    'buttonText' => '',
+    'buttonAction' => route('job-requests.create'),
+    'backgroundImage' => null // Optional background image
+])
 
 {{-- Hero Section --}}
-<div class="bg-background text-primary">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+<div class="relative text-primary {{ $backgroundImage ? 'bg-background' : 'bg-background' }}">
+    @if($backgroundImage)
+        <!-- Background Image with Grayscale -->
+        <div 
+            class="absolute inset-0 bg-cover bg-center" 
+            style="background-image: url('{{ $backgroundImage }}'); filter: grayscale(50%);">
+        </div>
+    @endif
+
+    <!-- Content -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
         <div class="text-center max-w-3xl mx-auto">
-            <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-secondary">
+            <h2 class="text-3xl font-extrabold tracking-tight sm:text-5xl text-secondary">
                 {{ $title ?? 'Ready to Fix Your Home Problems?' }}
             </h2>
-            <p class="mt-4 text-lg text-accent">
+            <p class="mt-4 text-xl {{ $backgroundImage ? 'text-background' : 'text-primary' }} font-bold">
                 {{ $description ?? 'Our professional handyman team is just a click away. Get your free quote today and solve those nagging home repair issues.' }}
             </p>
             @if($buttonText !== "")

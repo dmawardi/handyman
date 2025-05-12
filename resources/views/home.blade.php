@@ -3,7 +3,12 @@ description="Handyman Bali is your go-to destination for all handyman services i
 keywords="handyman, maintenance, maintenance requests, plumbing, electrician" canonical="url('/')">
     
     <x-whatsapp-button />
-    <x-hero-section title="Reliable Handyman Services in Bali" description="Book skilled professionals for repairs, installations, and maintenance — fast, easy, and trustworthy." buttonText="Explore Services" :buttonAction="route('services')" />
+    <x-hero-section title="Reliable Maintenance Services in Bali" 
+    description="Book skilled professionals for repairs, installations, and maintenance — fast, easy, and trustworthy." 
+    buttonText="Explore Services" 
+    :buttonAction="route('services')"
+    backgroundImage="{{ asset('images/home/hero-team.jpg') }}"
+    />
     <x-home.how-it-works />
     <x-home.testimonials />
     <x-hero-section title="Need Help Around the House?" description="Let us handle your repairs while you enjoy Bali life stress-free." buttonText="Request Service Now" />
