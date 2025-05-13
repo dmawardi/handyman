@@ -1,4 +1,3 @@
-<!-- filepath: /Users/d/Web Development/projects/handyman/resources/views/job_requests/edit.blade.php -->
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">

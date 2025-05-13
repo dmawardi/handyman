@@ -1,4 +1,3 @@
-<!-- filepath: /Users/d/Web Development/projects/handyman/resources/views/layouts/footer.blade.php -->
 <footer class="bg-primary text-background py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -6,7 +5,7 @@
             <div>
                 <h3 class="text-lg font-semibold mb-4">About Us</h3>
                 <p class="text-sm">
-                    RumahFix is your trusted partner for all handyman services. From plumbing to electrical work, we ensure quality and reliability in every job.
+                    RumahFix is your trusted partner for all maintenance services. From plumbing to electrical work, we ensure quality and reliability in every job.
                 </p>
                 <p class="mt-4 text-sm">
                     <strong>Service Areas:</strong> Canggu, Seminyak, Umalas, Kerobokan, Pereranan<br>

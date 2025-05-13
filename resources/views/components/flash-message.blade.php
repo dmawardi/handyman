@@ -1,4 +1,3 @@
-<!-- filepath: /Users/d/Web Development/projects/handyman/resources/views/components/flash-message.blade.php -->
 <div id="flash-message-container" class="fixed top-0 left-0 right-0 z-50 px-4 py-3 pointer-events-none">
     @if (session('success'))
         <div id="flash-success" class="flex items-center justify-between p-4 mb-4 rounded-lg shadow-md bg-green-100 border-l-4 border-green-500 text-green-700 pointer-events-auto" role="alert">
