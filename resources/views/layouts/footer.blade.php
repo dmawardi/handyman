@@ -10,7 +10,7 @@
                 <p class="mt-4 text-sm">
                     <strong>Service Areas:</strong> Canggu, Seminyak, Umalas, Kerobokan, Pereranan<br>
                     @php
-                        $phone = env('BUSINESS_PHONE');
+                        $phone = config('business.phone'); // Get the phone number from the config
                         // Place spaces in the phone number for better readability
                         $formattedPhone = implode(' ', str_split($phone, 3));
                     @endphp
