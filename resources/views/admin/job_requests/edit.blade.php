@@ -13,7 +13,7 @@
         formAction="{{ route('admin.job-requests.update', $jobRequest->id) }}"
         formMethod="PATCH"
         submitButtonText="Update Request"
-        apiKey="{{ env('GOOGLE_API_KEY') }}"
+        apiKey="{{ config('api.google-places') }}"
         :jobRequest="$jobRequest"
         :users="$users"
         :workers="$workers"

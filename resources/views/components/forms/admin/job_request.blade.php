@@ -5,7 +5,7 @@
     'submitButtonText' => 'Create Job Request',
     'users' => [],
     'workers' => [],
-    'apiKey' => env('GOOGLE_API_KEY'),
+    'apiKey' => config('api.google-places'),
 ])
 
 <div class="py-12">

@@ -3,7 +3,7 @@
     'formAction' => route('job-requests.store'),
     'formMethod' => 'POST',
     'submitButtonText' => 'Submit Request',
-    'apiKey' => env('GOOGLE_API_KEY'),
+    'apiKey' => config('api.google-places'),
 ])
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

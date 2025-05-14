@@ -13,7 +13,7 @@
         formAction="{{ route('admin.job-requests.store') }}"
         formMethod="POST"
         submitButtonText="Submit Request"
-        apiKey="{{ env('GOOGLE_API_KEY') }}"
+        apiKey="{{ config('api.google-places') }}"
         :jobRequest="null"
         :users="$users"
         :workers="$workers"
