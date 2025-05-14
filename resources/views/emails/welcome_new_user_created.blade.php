@@ -1,4 +1,14 @@
-{{-- filepath: /Users/d/Web Development/projects/handyman/resources/views/emails/welcome_new_user_created.blade.php --}}
+@props([
+    'user' => null,
+    'generatedPassword' => null,
+])
+
+{{-- This is the email template for welcoming a new user to RumahFix --}}
+{{-- It includes a header, body with user details, and a footer --}}
+
+{{-- The email is styled using inline CSS for better compatibility with email clients --}}
+{{-- The button is styled to look like a clickable link for logging in --}}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,12 +71,12 @@
 
         <!-- Body -->
         <div class="email-body">
-            <p>Hi {{ $jobRequest->contact_name }},</p>
-            <p>We’re excited to welcome you to RumahFix! Your account has been successfully created, and you can now access our platform to manage your job requests and services.</p>
+            <p>Hi {{ $user->name }},</p>
+            <p>We're excited to welcome you to RumahFix! Your account has been successfully created, and you can now access our platform to manage your job requests and services.</p>
             
             <p><strong>Your login details:</strong></p>
             <ul>
-                <li><strong>Email:</strong> {{ $jobRequest->contact_email }}</li>
+                <li><strong>Email:</strong> {{ $user->email }}</li>
                 <li><strong>Password:</strong> {{ $generatedPassword }}</li>
             </ul>
             

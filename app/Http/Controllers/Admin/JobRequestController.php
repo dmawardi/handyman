@@ -101,7 +101,7 @@ class JobRequestController extends Controller
             ]);
 
             // Send email to the new user with the generated password
-            Mail::to($user->email)->queue(new \App\Mail\WelcomeNewUserEmail($user, $genPassword));
+            Mail::to($user->email)->queue(new \App\Mail\WelcomeNewUser($user, $genPassword));
 
             // Add new user details to the request
             $request->merge([

@@ -64,7 +64,7 @@ class JobRequestController extends Controller
             $user->save();
 
             // Send a welcome email to the new user
-            Mail::to($user->email)->queue(new \App\Mail\WelcomeNewUserEmail($user, $genPassword));
+            Mail::to($user->email)->queue(new \App\Mail\WelcomeNewUser($user, $genPassword));
         }
         
         // Remove attachments from validated data for job request creation
