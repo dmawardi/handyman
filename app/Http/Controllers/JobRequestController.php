@@ -85,6 +85,10 @@ class JobRequestController extends Controller
         
         // Send a confirmation email to the user
         Mail::to($user->email)->queue(new \App\Mail\JobRequestCreationConfirmation($jobRequest));
+
+        // Send a notification email to the admin
+        $adminEmail = config('business.email');
+        Mail::to($adminEmail)->queue(new \App\Mail\AdminJobRequestCreation($jobRequest));
         
         // Redirect to a confirmation page or back to dashboard
         return redirect()->route('job-requests.create')
