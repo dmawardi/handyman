@@ -58,9 +58,13 @@ class JobRequestController extends Controller
             $user->name = $validated['contact_name'];
             $user->email = $validated['contact_email'];
             $user->phone = $validated['contact_phone'];
-            // Set a default password or generate one
-            $user->password = bcrypt('defaultpassword'); // Use a secure password generation method in production
+            // Generate a secure random password
+            $genPassword = \Illuminate\Support\Str::random(16);
+            $user->password = $genPassword;
             $user->save();
+
+            // Send a welcome email to the new user
+            Mail::to($user->email)->queue(new \App\Mail\WelcomeNewUserEmail($user, $genPassword));
         }
         
         // Remove attachments from validated data for job request creation
