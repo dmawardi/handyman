@@ -1,8 +1,15 @@
 <x-app-layout title="Handyman Bali | Admin Dashboard">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Admin Dashboard') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Admin Dashboard') }}
+            </h2>
+            <div>
+                <a href="{{ route('admin.job-requests.index') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    View Job Requests
+                </a>
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-6">
