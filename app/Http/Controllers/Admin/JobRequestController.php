@@ -87,14 +87,23 @@ class JobRequestController extends Controller
                 'contact_email' => 'required|email|max:255|unique:users,email',
                 'contact_phone' => 'required|string|max:20',
             ]);
+
+            // Generate a random password
+            $genPassword = \Illuminate\Support\Str::random(16);
+
             // Create a new user
             $user = User::create([
                 'name' => $request->contact_name,
                 'email' => $request->contact_email,
                 'phone' => $request->contact_phone,
                 'user_type' => 'customer',
-                'password' => bcrypt('defaultpassword'), // Generate random password
+                'password' => bcrypt($genPassword), // Generate random password
             ]);
+
+            // Send email to the new user with the generated password
+            Mail::to($user->email)->queue(new \App\Mail\WelcomeNewUserEmail($user, $genPassword));
+
+            // Add new user details to the request
             $request->merge([
                 'user_id' => $user->id,
                 'contact_name' => $user->name,
