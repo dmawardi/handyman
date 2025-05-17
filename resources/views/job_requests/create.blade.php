@@ -2,7 +2,7 @@
 description="Have a job that needs doing? Submit a request for maintenance services in Bali. Our team is ready to assist you with all your maintenance needs, from plumbing to electrical work and more."
 keywords="handyman services, plumbing, electrical work, carpentry, maintenance, Bali" canonical="url('/job-requests/create')">
     <x-slot name="header">
-        <h1>
+        <h1 class="font-semibold text-xl text-primary leading-tight">
             {{ __('Submit Your Job Request') }}
         </h1>
         <p>
