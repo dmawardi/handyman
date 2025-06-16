@@ -33,10 +33,10 @@ class JobRequestController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('job_number', 'like', "%{$search}%")
-                  ->orWhere('contact_name', 'like', "%{$search}%")
-                  ->orWhere('contact_email', 'like', "%{$search}%")
-                  ->orWhere('contact_phone', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(job_number) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(contact_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(contact_email) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(contact_phone) LIKE ?', ['%' . strtolower($search) . '%']);
             });
         }
         
