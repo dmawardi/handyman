@@ -1,3 +1,7 @@
+@props([
+    'phoneNumber' => config('business.phone'), // Default phone number
+    'message' => "Hey RumahFix! I’d like to book a service (details below).\nName:\nEmail:\nAddress:\nUrgency(Emergency/48hrs/1week):\nJob Description:" // Default message
+])
 <footer class="bg-primary text-background py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -35,7 +39,7 @@
                 <p class="text-sm mb-4">
                     Need assistance? Chat with us on WhatsApp for quick support.
                 </p>
-                <a href="https://wa.me/{{ env('BUSINESS_PHONE') }}?text={{ urlencode('Hello RumahFix! I need assistance with your services.') }}" 
+                <a href="https://wa.me/{{ $phoneNumber }}?text={{ urlencode($message) }}" 
                    target="_blank" 
                    rel="noopener noreferrer"
                    class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md shadow-lg transition-all duration-300">
