@@ -243,8 +243,6 @@ class JobRequestController extends Controller
             'delete_attachments' => array_filter($request->input('delete_attachments', [])),
         ]);
 
-        Log::info('Request: ', $request->all());
-
         // Validate the request data
         $validated = $request->validate([
             'worker_id' => 'nullable|exists:users,id',
@@ -273,7 +271,7 @@ class JobRequestController extends Controller
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,webp|max:5048',
             'delete_attachments' => 'nullable|array',
-            'delete_attachments.*' => 'nullable|exists:job_request_attachments,id',
+            // 'delete_attachments.*' => 'nullable|exists:job_request_attachments,id',
             // Financial information
             'payment_method' => 'nullable|string|max:255',
             'payment_status' => 'nullable|string|in:Pending,Completed,Failed',
@@ -478,17 +476,22 @@ class JobRequestController extends Controller
     // Takes a list of IDs and an image ID
     private function handleAtachmentDeletions($listOfIds)
     {
-        foreach($listOfIds as $id) {
-            // Find the attachment by ID
-            $attachment = \App\Models\JobRequestAttachment::findOrFail($id);
-            
-            // Delete the attachment from S3
-            if ($attachment->path) {
-                Storage::disk('s3')->delete($attachment->path);
+        // If it's an array with a single comma-separated string, split it
+        if (count($listOfIds) === 1 && is_string($listOfIds[0]) && str_contains($listOfIds[0], ',')) {
+            $listOfIds = explode(',', $listOfIds[0]);
+        }
+        // Convert the list of IDs (string) to an array of integers
+        $listOfIds = array_map('intval', $listOfIds);
+
+        // Get the images from the database based on the list of IDs
+        $images = \App\Models\JobRequestAttachment::whereIn('id', $listOfIds)->get();
+
+        // Loop through each image, delete it from S3, and then delete the record
+        foreach ($images as $image) {
+            if ($image->path) {
+                Storage::disk('s3')->delete($image->path);
             }
-            
-            // Delete the attachment record from the database
-            $attachment->delete();
+            $image->delete();
         }
     }
 }

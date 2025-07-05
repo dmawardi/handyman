@@ -13,7 +13,7 @@ class JobRequestController extends Controller
     {
         // Fetch all job requests for the authenticated user
         $user = auth()->user();
-        $jobRequests = \App\Models\JobRequest::where('user_id', $user->id)->get();
+        $jobRequests = \App\Models\JobRequest::with('attachments')->where('user_id', $user->id)->get();
         return view('job_requests.index', compact('jobRequests'));
     }
 
@@ -83,6 +83,8 @@ class JobRequestController extends Controller
             $this->handleImageAttachments($validated['attachments'], $jobRequest, $user);
         }
         
+        // Load the job request with attachments and user
+        $jobRequest->loadMissing(['requestor', 'attachments']); // Use loadMissing to avoid duplicate loading
         // Send a confirmation email to the user
         Mail::to($user->email)->queue(new \App\Mail\JobRequestCreationConfirmation($jobRequest));
 
@@ -288,16 +290,21 @@ class JobRequestController extends Controller
     // Takes a list of IDs and an image ID
     private function handleImageAtachmentDeletions($listOfIds)
     {
-        foreach($listOfIds as $id) {
-            // Find the image by ID
-            $image = \App\Models\JobRequestAttachment::findOrFail($id);
-            
-            // Delete the image from S3
+        // If it's an array with a single comma-separated string, split it
+        if (count($listOfIds) === 1 && is_string($listOfIds[0]) && str_contains($listOfIds[0], ',')) {
+            $listOfIds = explode(',', $listOfIds[0]);
+        }
+        // Convert the list of IDs (string) to an array of integers
+        $listOfIds = array_map('intval', $listOfIds);
+        
+        // Get the images from the database based on the list of IDs
+        $images = \App\Models\JobRequestAttachment::whereIn('id', $listOfIds)->get();
+
+        // Loop through each image, delete it from S3, and then delete the record
+        foreach ($images as $image) {
             if ($image->path) {
                 Storage::disk('s3')->delete($image->path);
             }
-            
-            // Delete the image record from the database
             $image->delete();
         }
     }
