@@ -92,10 +92,32 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1 bg-background">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-primary hover:text-accent">
-                {{ __('Dashboard') }}
+        {{-- AUTH --}}
+        @auth
+        {{-- Will take you to admin dashboard or basic depending on role --}}
+            <x-responsive-nav-link 
+            :href="auth()->user()->user_type == 'admin' ? route('admin.dashboard') : route('dashboard')" 
+            :active="request()->routeIs('dashboard') || request()->routeIs('admin.dashboard')" 
+            class="text-primary hover:text-accent">
+                {{  __('Dashboard') }}
             </x-responsive-nav-link>
-        </div>
+        @endauth
+
+        {{-- PUBLIC --}}
+        <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')" class="text-primary hover:text-accent">
+            {{ __('Home') }}
+        </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('services')" :active="request()->routeIs('services')" class="text-primary hover:text-accent">
+            {{ __('Services') }}
+        </x-responsive-nav-link>
+
+        {{-- Login button for guests (mobile) --}}
+        @guest
+            <x-responsive-nav-link :href="route('login')" class="text-primary hover:text-accent">
+                {{ __('Login') }}
+            </x-responsive-nav-link>
+        @endguest
+    </div>
 
         <!-- Responsive Settings Options -->
         @auth
