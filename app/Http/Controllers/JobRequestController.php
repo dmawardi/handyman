@@ -42,7 +42,6 @@ class JobRequestController extends Controller
             'latitude' => 'nullable|string|max:20',
             'longitude' => 'nullable|string|max:20',
             // Job details
-            'notes' => 'required|string|max:65535',
             'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
             'job_budget' => 'nullable|numeric|min:0',
@@ -185,7 +184,6 @@ class JobRequestController extends Controller
             'longitude' => 'nullable|string|max:20',
             'job_type' => 'required|string|in:Plumbing,Electrical,Painting,Appliance Repair,Outdoor/Garden,Installations,Cleaning/Maintenance,Other',
             'urgency_level' => 'required|string|in:Low - Within 2 weeks,Medium - Within 1 week,High - Within 48 hours,Emergency - Same day',
-            'notes' => 'required|string|max:65535', 
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'required|string',
             'attachments.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120', // Validate attachments

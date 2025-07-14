@@ -140,7 +140,7 @@ class JobRequestController extends Controller
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'required|string',
             'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
-            'notes' => 'nullable|string',
+            'notes' => 'nullable|string|max:65535',
             // attachments
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5048',
@@ -266,7 +266,7 @@ class JobRequestController extends Controller
             'job_budget' => 'nullable|numeric|min:0',
             'job_description' => 'nullable|string',
             'status' => 'nullable|string|in:Pending,In Progress,Completed,Cancelled',
-            'notes' => 'nullable|string',
+            'notes' => 'nullable|string|max:65535',
             // attachments
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,webp|max:5048',
@@ -383,7 +383,7 @@ class JobRequestController extends Controller
     public function updateStatus(Request $request, JobRequest $jobRequest)
     {
         $validated = $request->validate([
-            'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled',
+            'status' => 'required|string|in:Pending,In Progress,Completed,Cancelled,Awaiting Payment,Payment Received',
         ]);
         
         $oldStatus = $jobRequest->status;

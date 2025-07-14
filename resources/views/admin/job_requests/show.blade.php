@@ -53,10 +53,15 @@
                                 <form method="POST" action="{{ route('admin.job-requests.update-status', $jobRequest->id) }}" class="mt-2">
                                     @csrf
                                     @method('PATCH')
+                                    {{-- Errors --}}
+                                    @if ($errors->has('status'))
+                                        <span class="text-red-600 text-sm">{{ $errors->first('status') }}</span>
+                                    @endif
                                     <div class="flex items-center space-x-2">
                                         <select name="status" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                             <option value="Pending" {{ $jobRequest->status == 'Pending' ? 'selected' : '' }}>Pending</option>
                                             <option value="In Progress" {{ $jobRequest->status == 'In Progress' ? 'selected' : '' }}>In Progress</option>
+                                            <option value="Awaiting Payment" {{ $jobRequest->status == 'Awaiting Payment' ? 'selected' : '' }}>Awaiting Payment</option>
                                             <option value="Completed" {{ $jobRequest->status == 'Completed' ? 'selected' : '' }}>Completed</option>
                                             <option value="Cancelled" {{ $jobRequest->status == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
                                         </select>
