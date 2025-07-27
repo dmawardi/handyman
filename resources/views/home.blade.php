@@ -10,6 +10,7 @@ keywords="handyman, maintenance, maintenance requests, plumbing, electrician" ca
     backgroundImage="{{ asset('images/home/hero-team.jpg') }}"
     />
     <x-home.how-it-works />
+    <x-home.service-areas />
     <x-home.testimonials />
     <x-hero-section title="Need Help Around the House?" description="Let us handle your repairs while you enjoy Bali life stress-free." buttonText="Request Service Now" />
 </x-app-layout>
